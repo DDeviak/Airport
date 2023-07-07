@@ -15,53 +15,19 @@ namespace Airport
         public Airline Airline { get; private set; }
         public double Price { get; private set; }
 
-    }
+        public Flight(City departureCity, City arrivalCity, DateTime departureDatetime, DateTime arrivalDatetime, Airline airline, double price)
+        {
+            DepartureCity = departureCity;
+            ArrivalCity = arrivalCity;
+            DepartureDatetime = departureDatetime;
+            ArrivalDatetime = arrivalDatetime;
+            Airline = airline;
+            Price = price;
+        }
 
-    enum City
-    {
-        NewYork,
-        LosAngeles,
-        Chicago,
-        Houston,
-        Phoenix,
-        Philadelphia,
-        SanAntonio,
-        SanDiego,
-        Dallas,
-        SanJose,
-        Austin,
-        Jacksonville,
-        SanFrancisco,
-        Indianapolis,
-        Columbus,
-        FortWorth,
-        Charlotte,
-        Seattle,
-        Denver,
-        Washington
+        public override string ToString()
+        {
+            return String.Format("{0} - {1}, {2} - {3}, {4}, ${5}", DepartureCity, ArrivalCity, DepartureDatetime, ArrivalDatetime, Airline, Price);
+        }
     }
-    enum Airline
-    {
-        Delta,
-        AmericanAirlines,
-        United,
-        Southwest,
-        AirFrance,
-        Lufthansa,
-        BritishAirways,
-        Emirates,
-        CathayPacific,
-        Qantas,
-        AirCanada,
-        SingaporeAirlines,
-        TurkishAirlines,
-        ANA,
-        JapanAirlines,
-        KoreanAir,
-        EtihadAirways,
-        VirginAtlantic,
-        QatarAirways,
-        JetBlue
-    }
-
 }

@@ -51,14 +51,19 @@ namespace Airport
             }
         }
 
-        public List<Flight> GetFlightsByCity(City city) 
+        public IEnumerable<City> GetCities()
+        {
+            return _flights.Keys;
+        }
+
+        public IEnumerable<Flight> GetFlightsByCity(City city) 
         {
             List<Flight> tempFlightsByCity;
             if (_flights.TryGetValue(city, out tempFlightsByCity))
             {
                 return tempFlightsByCity;
             }
-            return null;
+            return new List<Flight>();
         }
     }
 }
