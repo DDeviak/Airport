@@ -19,7 +19,7 @@ namespace Airport
             _graph = graph;
         }
 
-        IEnumerable<Flight> GetPath(City from, City to)
+        IEnumerable<Flight> GetPath(City from, City to, DateTime date)
         {
             Dictionary<City, ValueTuple<double, Flight, bool>> flags = new Dictionary<City, ValueTuple<double, Flight, bool>>();
 
@@ -42,9 +42,13 @@ namespace Airport
                 var flights = _graph.GetFlightsByCity(currentCity).ToList();
                 flights.ForEach((Flight t) =>
                 {
-                    double deltaTime = (t.DepartureDatetime - cf.Item2.ArrivalDatetime).TotalHours;
-                    if (!((_minTimeBetweenFlights <= deltaTime) && (deltaTime <= _maxTimeBetweenFlights))) return;
-                    if (t.Price + cf.Item1 < flags[t.ArrivalCity].Item1)
+                    if (cf.Item2 != null)
+                    {
+                        double deltaTime = (t.DepartureDatetime - cf.Item2.ArrivalDatetime).TotalHours;
+                        if ((_minTimeBetweenFlights >= deltaTime) || (deltaTime >= _maxTimeBetweenFlights)) return;
+                    }
+                    if (t.DepartureDatetime.Date <= date) return;
+                        if (t.Price + cf.Item1 < flags[t.ArrivalCity].Item1)
                     {
                         var f = flags[t.ArrivalCity];
                         f.Item1 = t.Price + cf.Item1;
