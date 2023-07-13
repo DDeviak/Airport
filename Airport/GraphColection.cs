@@ -8,47 +8,25 @@ namespace Airport
 {
     class GraphColection
     {
-        Dictionary<City,List<Flight>> _flights = new Dictionary<City, List<Flight>>();
+        Dictionary<City,Dictionary<int,Flight>> _flights = new Dictionary<City, Dictionary<int, Flight>>();
 
         public void Add(Flight item)
         {
-            List<Flight> tempFlightsByCity;
-            if(_flights.TryGetValue(item.DepartureCity,out tempFlightsByCity)) 
+            _flights[item.DepartureCity][item.ID]=item;
+        }
+
+        public void Remove(int id)
+        {
+            foreach (var t in _flights.Values)
             {
-                tempFlightsByCity.Add(item);
-            }
-            else
-            {
-                tempFlightsByCity = new List<Flight>();
-                _flights.Add(item.DepartureCity, tempFlightsByCity);
+                if (t.Remove(id)) break;
             }
         }
 
-        public void Remove(Flight item)
+        public void Modify(int id, Flight itemNew)
         {
-            List<Flight> tempFlightsByCity;
-            if (_flights.TryGetValue(item.DepartureCity, out tempFlightsByCity))
-            {
-                tempFlightsByCity.Remove(item);
-            }
-        }
-
-        public void Modify(Flight itemOld,Flight itemNew)
-        {
-            List<Flight> tempFlightsByCity;
-            if (_flights.TryGetValue(itemOld.DepartureCity, out tempFlightsByCity))
-            {
-                tempFlightsByCity.Remove(itemOld);
-            }
-            if (_flights.TryGetValue(itemNew.DepartureCity, out tempFlightsByCity))
-            {
-                tempFlightsByCity.Add(itemNew);
-            }
-            else
-            {
-                tempFlightsByCity = new List<Flight>();
-                _flights.Add(itemNew.DepartureCity, tempFlightsByCity);
-            }
+            Remove(id);
+            Add(itemNew);
         }
 
         public IEnumerable<City> GetCities()
@@ -58,12 +36,7 @@ namespace Airport
 
         public IEnumerable<Flight> GetFlightsByCity(City city) 
         {
-            List<Flight> tempFlightsByCity;
-            if (_flights.TryGetValue(city, out tempFlightsByCity))
-            {
-                return tempFlightsByCity;
-            }
-            return new List<Flight>();
+            return _flights[city].Values;
         }
     }
 }
