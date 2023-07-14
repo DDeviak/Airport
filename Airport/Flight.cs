@@ -61,8 +61,9 @@ namespace Airport
             }
         }
 
-        public Flight(City departureCity, City arrivalCity, DateTime departureDatetime, DateTime arrivalDatetime, Airline airline, double price)
+        public Flight(int id, City departureCity, City arrivalCity, DateTime departureDatetime, DateTime arrivalDatetime, Airline airline, double price)
         {
+            ID = id;
             DepartureCity = departureCity;
             ArrivalCity = arrivalCity;
             DepartureDatetime = departureDatetime;

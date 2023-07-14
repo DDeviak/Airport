@@ -14,12 +14,12 @@ namespace Airport
         const int _maxTimeBetweenFlights = 7;
         const int _minTimeBetweenFlights = 1;
 
-        Pathfinder(GraphColection graph)
+        public Pathfinder(ref GraphColection graph)
         {
             _graph = graph;
         }
 
-        IEnumerable<Flight> GetPath(City from, City to, DateTime date)
+        public IEnumerable<Flight> GetPath(City from, City to, DateTime date)
         {
             Dictionary<City, ValueTuple<double, Flight, bool>> flags = new Dictionary<City, ValueTuple<double, Flight, bool>>();
 
