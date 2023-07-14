@@ -57,59 +57,63 @@ namespace Airport
 			string comand;
 			while (true)
 			{
-				comand = Console.ReadLine();
-				switch (comand)
+				try
 				{
-					case "read":
-						Console.WriteLine("Enter file path");
-						graphColection = ReadFromFile(Console.ReadLine());
-						break;
-					case "write":
-						Console.WriteLine("Enter file path");
-						WriteToFile(Console.ReadLine(), graphColection);
-						break;
-					case "add":
-						graphColection.Add(FlightConsoleInput());
-						break;
-					case "delete":
-						Console.WriteLine("Enter Flight ID");
-						key = int.Parse(Console.ReadLine());
-						graphColection.Remove(key);
-						break;
-					case "edit":
-						Console.WriteLine("Enter target ID");
-						key = int.Parse(Console.ReadLine());
-						graphColection.Modify(key,FlightConsoleInput());
-						break;
-					case "search":
-                        Console.WriteLine("Input Flight Departure City:");
-                        City departureCity = Enum.Parse<City>(Console.ReadLine());
-                        Console.WriteLine("Input Flight Arrival City:");
-                        City arrivalCity = Enum.Parse<City>(Console.ReadLine());
-                        Console.WriteLine("Input Flight Departure Datetime:");
-                        DateTime departureDatetime = DateTime.Parse(Console.ReadLine());
-                        List<Flight> flights = pathfinder.GetPath(departureCity, arrivalCity, departureDatetime).ToList<Flight>();
-						flights.ForEach(t=>Console.WriteLine(t));
-						break;
-					case "by month":
-						//TODO
-						break;
-					case "by country":
-						//TODO
-						break;
-					case "output":
-						foreach (var city in graphColection.GetCities())
-						{
-							graphColection.GetFlightsByCity(city).ToList().ForEach(t => Console.WriteLine(t));
-						}
-						break;
-					case "exit":
-						return;
-						break;
-					default:
-						Console.WriteLine("Invalid comand");
-						break;
+					comand = Console.ReadLine();
+					switch (comand)
+					{
+						case "read":
+							Console.WriteLine("Enter file path");
+							graphColection = ReadFromFile(Console.ReadLine());
+							break;
+						case "write":
+							Console.WriteLine("Enter file path");
+							WriteToFile(Console.ReadLine(), graphColection);
+							break;
+						case "add":
+							graphColection.Add(FlightConsoleInput());
+							break;
+						case "delete":
+							Console.WriteLine("Enter Flight ID");
+							key = int.Parse(Console.ReadLine());
+							graphColection.Remove(key);
+							break;
+						case "edit":
+							Console.WriteLine("Enter target ID");
+							key = int.Parse(Console.ReadLine());
+							graphColection.Modify(key, FlightConsoleInput());
+							break;
+						case "search":
+							Console.WriteLine("Input Flight Departure City:");
+							City departureCity = Enum.Parse<City>(Console.ReadLine());
+							Console.WriteLine("Input Flight Arrival City:");
+							City arrivalCity = Enum.Parse<City>(Console.ReadLine());
+							Console.WriteLine("Input Flight Departure Datetime:");
+							DateTime departureDatetime = DateTime.Parse(Console.ReadLine());
+							List<Flight> flights = pathfinder.GetPath(departureCity, arrivalCity, departureDatetime).ToList<Flight>();
+							flights.ForEach(t => Console.WriteLine(t));
+							break;
+						case "by month":
+							//TODO
+							break;
+						case "by country":
+							//TODO
+							break;
+						case "output":
+							foreach (var city in graphColection.GetCities())
+							{
+								graphColection.GetFlightsByCity(city).ToList().ForEach(t => Console.WriteLine(t));
+							}
+							break;
+						case "exit":
+							return;
+							break;
+						default:
+							Console.WriteLine("Invalid comand");
+							break;
+					}
 				}
+				catch (Exception ex) { Console.WriteLine(ex.Message); }
 			}
 		}
 	}
