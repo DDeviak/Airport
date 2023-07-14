@@ -12,6 +12,7 @@ namespace Airport
 
         public void Add(Flight item)
         {
+            if(!_flights.ContainsKey(item.DepartureCity)) _flights[item.DepartureCity] = new Dictionary<int,Flight>();
             _flights[item.DepartureCity][item.ID]=item;
         }
 
