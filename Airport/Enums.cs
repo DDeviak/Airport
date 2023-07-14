@@ -8,6 +8,7 @@ namespace Airport
 {
     enum City
     {
+        Undefined = 0,
         NewYork,
         LosAngeles,
         Chicago,
@@ -31,6 +32,7 @@ namespace Airport
     }
     enum Airline
     {
+        Undefined = 0,
         Delta,
         AmericanAirlines,
         United,
