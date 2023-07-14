@@ -1,12 +1,10 @@
-﻿using System.Diagnostics;
-using System.IO;
-using System.Text;
-using System.Text.Json;
+﻿using System.Runtime.Serialization.Json;
 
 namespace Airport
 {
 	internal class Manager
 	{
+		static DataContractJsonSerializer jsonSerializer = new DataContractJsonSerializer(typeof(GraphColection));
 		static void Menu()
 		{
 			Console.WriteLine(
@@ -25,17 +23,12 @@ namespace Airport
 		static GraphColection ReadFromFile(string path)
 		{
 			FileStream fileStream = File.Open(path, FileMode.OpenOrCreate);
-			byte[] buffer = new byte[fileStream.Length];
-			fileStream.Read(buffer, 0, buffer.Length);
-			string json = Encoding.Default.GetString(buffer);
-			return JsonSerializer.Deserialize<GraphColection>(json);
+			return (GraphColection)jsonSerializer.ReadObject(fileStream);
 		}
 		static void WriteToFile(string path, GraphColection gc)
 		{
 			FileStream fileStream = File.Open(path, FileMode.OpenOrCreate);
-			string json = JsonSerializer.Serialize(gc);
-			byte[] buffer = Encoding.Default.GetBytes(json);
-			fileStream.Write(buffer, 0, buffer.Length);
+			jsonSerializer.WriteObject(fileStream, gc);
 		}
 		static Flight FlightConsoleInput()
 		{

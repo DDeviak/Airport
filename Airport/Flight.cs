@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.Serialization;
 
 namespace Airport
 {
+    [DataContract()]
     class Flight
     {
+        [DataMember()]
         public int ID { get; private set; }
+        [DataMember()]
         private City departureCity;
         public City DepartureCity {
             get { return departureCity; }
@@ -19,6 +17,7 @@ namespace Airport
                 departureCity = value;
             }
         }
+        [DataMember()]
         private City arrivalCity;
         public City ArrivalCity
         {
@@ -29,9 +28,13 @@ namespace Airport
                 arrivalCity = value;
             }
         }
+        [DataMember()]
         public DateTime DepartureDatetime { get; private set; }
+        [DataMember()]
         public DateTime ArrivalDatetime { get; private set; }
+        [DataMember()]
         public Airline Airline { get; private set; }
+        [DataMember()]
         private double price;
         public double Price
         {
