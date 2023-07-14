@@ -29,26 +29,8 @@ namespace Airport
                 arrivalCity = value;
             }
         }
-        private DateTime departureDatetime;
-        public DateTime DepartureDatetime
-        {
-            get { return departureDatetime; }
-            private set 
-            {
-                if (arrivalDatetime < value) throw new ArgumentException("ArrivalDatetime can`t be sooner than DepartureDatetime");
-                departureDatetime = value; 
-            }
-        }
-        private DateTime arrivalDatetime;
-        public DateTime ArrivalDatetime
-        {
-            get { return departureDatetime; }
-            private set
-            {
-                if (value < departureDatetime) throw new ArgumentException("ArrivalDatetime can`t be sooner than DepartureDatetime");
-                arrivalDatetime = value;
-            }
-        }
+        public DateTime DepartureDatetime { get; private set; }
+        public DateTime ArrivalDatetime { get; private set; }
         public Airline Airline { get; private set; }
         private double price;
         public double Price
@@ -63,6 +45,7 @@ namespace Airport
 
         public Flight(int id, City departureCity, City arrivalCity, DateTime departureDatetime, DateTime arrivalDatetime, Airline airline, double price)
         {
+            if (arrivalDatetime < departureDatetime) throw new ArgumentException("ArrivalDatetime can`t be sooner than DepartureDatetime");
             ID = id;
             DepartureCity = departureCity;
             ArrivalCity = arrivalCity;
