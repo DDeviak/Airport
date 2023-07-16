@@ -1,12 +1,13 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.Serialization.Json;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace Airport
 {
 	internal class Manager
 	{
-		static DataContractJsonSerializer jsonSerializer = new DataContractJsonSerializer(typeof(GraphCollection));
+		static JsonSerializer jsonSerializer = new JsonSerializer();
 		static void Menu()
 		{
 			Console.WriteLine(
@@ -25,7 +26,6 @@ namespace Airport
 		static void Main(string[] args)
 		{
 			Menu();
-			FileStream fileStream;
 			GraphCollection graphCollection = new GraphCollection();
 			Pathfinder pathfinder = new Pathfinder(ref graphCollection);
 			int key;
@@ -39,13 +39,11 @@ namespace Airport
 					{
 						case "read":
 							Console.WriteLine("Enter file path");
-							fileStream = File.Open(Console.ReadLine(), FileMode.OpenOrCreate);
-							graphCollection = (GraphCollection)jsonSerializer.ReadObject(fileStream);
+							using (StreamReader sr = File.OpenText(Console.ReadLine())) { graphCollection = (GraphCollection)jsonSerializer.Deserialize(sr, typeof(GraphCollection)); }
 							break;
 						case "write":
 							Console.WriteLine("Enter file path");
-                            fileStream = File.Open(Console.ReadLine(), FileMode.OpenOrCreate);
-                            jsonSerializer.WriteObject(fileStream, graphCollection);
+							using (StreamWriter sw = File.CreateText(Console.ReadLine())) { jsonSerializer.Serialize(sw, graphCollection); }
                             break;
 						case "add":
 							graphCollection.Add(FlightFactory.FlightConsoleInput());
