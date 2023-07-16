@@ -3,7 +3,7 @@
 namespace Airport
 {
     [DataContract()]
-    class GraphColection
+    class GraphCollection
     {
         [DataMember()]
         Dictionary<City,Dictionary<int,Flight>> _flights = new Dictionary<City, Dictionary<int, Flight>>();
