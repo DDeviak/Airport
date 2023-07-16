@@ -77,7 +77,7 @@ namespace Airport
 							//TODO
 							break;
 						case "output":
-							foreach (var city in graphCollection.GetCities())
+							foreach (City city in graphCollection.GetCities())
 							{
 								graphCollection.GetFlightsByCity(city).ToList().ForEach(t => Console.WriteLine(t));
 							}

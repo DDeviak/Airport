@@ -16,7 +16,7 @@ namespace Airport
 
         public void Remove(int id)
         {
-            foreach (var t in _flights.Values)
+            foreach (Dictionary<int, Flight> t in _flights.Values)
             {
                 if (t.Remove(id)) break;
             }

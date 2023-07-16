@@ -16,7 +16,7 @@
         {
             Dictionary<City, ValueTuple<double, Flight, bool>> flags = new Dictionary<City, ValueTuple<double, Flight, bool>>();
 
-            foreach (var t in _graph.GetCities())
+            foreach (City t in _graph.GetCities())
             {
                 flags[t] = new ValueTuple<double, Flight, bool>(double.PositiveInfinity, null, false);
             }
@@ -31,8 +31,8 @@
             {
                 currentCity = pq.Dequeue();
                 if (flags[currentCity].Item3) continue;
-                var cf = flags[currentCity];
-                var flights = _graph.GetFlightsByCity(currentCity).ToList();
+                (double, Flight, bool) cf = flags[currentCity];
+                List<Flight> flights = _graph.GetFlightsByCity(currentCity).ToList();
                 flights.ForEach((Flight t) =>
                 {
                     if (cf.Item2 != null)
@@ -43,7 +43,7 @@
                     if (t.DepartureDatetime.Date <= date) return;
                         if (t.Price + cf.Item1 < flags[t.ArrivalCity].Item1)
                     {
-                        var f = flags[t.ArrivalCity];
+                        (double, Flight, bool) f = flags[t.ArrivalCity];
                         f.Item1 = t.Price + cf.Item1;
                         f.Item2 = t;
                         flags[t.ArrivalCity] = f;
@@ -53,13 +53,13 @@
                 cf.Item3 = true;
                 flags[currentCity] = cf;
             }
-            
-            var path = new List<Flight>();
+
+            List<Flight> path = new List<Flight>();
 
             currentCity = to;
             while (currentCity!=from)
             {
-                var f = flags[currentCity];
+                (double, Flight, bool) f = flags[currentCity];
                 if(f.Item2 == null) { throw new Exception("Path not found"); }
                 path.Add(f.Item2);
                 currentCity = f.Item2.DepartureCity;
