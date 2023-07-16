@@ -2,12 +2,12 @@
 {
     class Pathfinder
     {
-        GraphColection _graph;
+        GraphCollection _graph;
 
         const int _maxTimeBetweenFlights = 7;
         const int _minTimeBetweenFlights = 1;
 
-        public Pathfinder(ref GraphColection graph)
+        public Pathfinder(ref GraphCollection graph)
         {
             _graph = graph;
         }

@@ -4,7 +4,7 @@ namespace Airport
 {
 	internal class Manager
 	{
-		static DataContractJsonSerializer jsonSerializer = new DataContractJsonSerializer(typeof(GraphColection));
+		static DataContractJsonSerializer jsonSerializer = new DataContractJsonSerializer(typeof(GraphCollection));
 		static void Menu()
 		{
 			Console.WriteLine(
@@ -20,12 +20,12 @@ namespace Airport
 				"9. output -> to print the collection.\r\n" +
 				"10. exit -> to exit.\r\n");
 		}
-		static GraphColection ReadFromFile(string path)
+		static GraphCollection ReadFromFile(string path)
 		{
 			FileStream fileStream = File.Open(path, FileMode.OpenOrCreate);
-			return (GraphColection)jsonSerializer.ReadObject(fileStream);
+			return (GraphCollection)jsonSerializer.ReadObject(fileStream);
 		}
-		static void WriteToFile(string path, GraphColection gc)
+		static void WriteToFile(string path, GraphCollection gc)
 		{
 			FileStream fileStream = File.Open(path, FileMode.OpenOrCreate);
 			jsonSerializer.WriteObject(fileStream, gc);
@@ -51,8 +51,8 @@ namespace Airport
 		static void Main(string[] args)
 		{
 			Menu();
-			GraphColection graphColection = new GraphColection();
-			Pathfinder pathfinder = new Pathfinder(ref graphColection);
+			GraphCollection graphCollection = new GraphCollection();
+			Pathfinder pathfinder = new Pathfinder(ref graphCollection);
 			int key;
 			string comand;
 			while (true)
@@ -64,24 +64,24 @@ namespace Airport
 					{
 						case "read":
 							Console.WriteLine("Enter file path");
-							graphColection = ReadFromFile(Console.ReadLine());
+							graphCollection = ReadFromFile(Console.ReadLine());
 							break;
 						case "write":
 							Console.WriteLine("Enter file path");
-							WriteToFile(Console.ReadLine(), graphColection);
+							WriteToFile(Console.ReadLine(), graphCollection);
 							break;
 						case "add":
-							graphColection.Add(FlightConsoleInput());
+							graphCollection.Add(FlightConsoleInput());
 							break;
 						case "delete":
 							Console.WriteLine("Enter Flight ID");
 							key = int.Parse(Console.ReadLine());
-							graphColection.Remove(key);
+							graphCollection.Remove(key);
 							break;
 						case "edit":
 							Console.WriteLine("Enter target ID");
 							key = int.Parse(Console.ReadLine());
-							graphColection.Modify(key, FlightConsoleInput());
+							graphCollection.Modify(key, FlightConsoleInput());
 							break;
 						case "search":
 							Console.WriteLine("Input Flight Departure City:");
@@ -100,9 +100,9 @@ namespace Airport
 							//TODO
 							break;
 						case "output":
-							foreach (var city in graphColection.GetCities())
+							foreach (var city in graphCollection.GetCities())
 							{
-								graphColection.GetFlightsByCity(city).ToList().ForEach(t => Console.WriteLine(t));
+								graphCollection.GetFlightsByCity(city).ToList().ForEach(t => Console.WriteLine(t));
 							}
 							break;
 						case "exit":
