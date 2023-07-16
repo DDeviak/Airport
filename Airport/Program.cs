@@ -1,4 +1,6 @@
-﻿using System.Runtime.Serialization.Json;
+﻿using System;
+using System.IO;
+using System.Runtime.Serialization.Json;
 
 namespace Airport
 {
@@ -20,37 +22,10 @@ namespace Airport
 				"9. output -> to print the collection.\r\n" +
 				"10. exit -> to exit.\r\n");
 		}
-		static GraphCollection ReadFromFile(string path)
-		{
-			FileStream fileStream = File.Open(path, FileMode.OpenOrCreate);
-			return (GraphCollection)jsonSerializer.ReadObject(fileStream);
-		}
-		static void WriteToFile(string path, GraphCollection gc)
-		{
-			FileStream fileStream = File.Open(path, FileMode.OpenOrCreate);
-			jsonSerializer.WriteObject(fileStream, gc);
-		}
-		static Flight FlightConsoleInput()
-		{
-			Console.WriteLine("Input Flight ID:");
-			int id = int.Parse(Console.ReadLine());
-            Console.WriteLine("Input Flight Departure City:");
-            City departureCity = Enum.Parse<City>(Console.ReadLine());
-            Console.WriteLine("Input Flight Arrival City:");
-            City arrivalCity = Enum.Parse<City>(Console.ReadLine());
-            Console.WriteLine("Input Flight Departure Datetime:");
-            DateTime departureDatetime = DateTime.Parse(Console.ReadLine());
-            Console.WriteLine("Input Flight Arrival Datetime:");
-            DateTime arrivalDatetime = DateTime.Parse(Console.ReadLine());
-            Console.WriteLine("Input Flight Airline:");
-            Airline airline = Enum.Parse<Airline>(Console.ReadLine());
-            Console.WriteLine("Input Flight Price:");
-            double price = double.Parse(Console.ReadLine());
-			return new Flight(id, departureCity, arrivalCity, departureDatetime, arrivalDatetime, airline, price);
-		}
 		static void Main(string[] args)
 		{
 			Menu();
+			FileStream fileStream;
 			GraphCollection graphCollection = new GraphCollection();
 			Pathfinder pathfinder = new Pathfinder(ref graphCollection);
 			int key;
@@ -64,14 +39,16 @@ namespace Airport
 					{
 						case "read":
 							Console.WriteLine("Enter file path");
-							graphCollection = ReadFromFile(Console.ReadLine());
+							fileStream = File.Open(Console.ReadLine(), FileMode.OpenOrCreate);
+							graphCollection = (GraphCollection)jsonSerializer.ReadObject(fileStream);
 							break;
 						case "write":
 							Console.WriteLine("Enter file path");
-							WriteToFile(Console.ReadLine(), graphCollection);
-							break;
+                            fileStream = File.Open(Console.ReadLine(), FileMode.OpenOrCreate);
+                            jsonSerializer.WriteObject(fileStream, graphCollection);
+                            break;
 						case "add":
-							graphCollection.Add(FlightConsoleInput());
+							graphCollection.Add(FlightFactory.FlightConsoleInput());
 							break;
 						case "delete":
 							Console.WriteLine("Enter Flight ID");
@@ -81,7 +58,7 @@ namespace Airport
 						case "edit":
 							Console.WriteLine("Enter target ID");
 							key = int.Parse(Console.ReadLine());
-							graphCollection.Modify(key, FlightConsoleInput());
+							graphCollection.Modify(key, FlightFactory.FlightConsoleInput());
 							break;
 						case "search":
 							Console.WriteLine("Input Flight Departure City:");
