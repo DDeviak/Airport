@@ -1,4 +1,6 @@
-﻿using System.Runtime.Serialization;
+﻿using System.ComponentModel;
+using System.Reflection;
+using System.Runtime.Serialization;
 
 namespace Airport
 {
@@ -84,6 +86,19 @@ namespace Airport
             this.ArrivalDatetime = arrivalDatetime;
             this.Airline = airline;
             this.Price = price;
+        }
+        public object this[string propertyName]
+        {
+            get
+            {
+                PropertyInfo property = GetType().GetProperty(propertyName);
+                return property.GetValue(this, null);
+            }
+            set
+            {
+                PropertyInfo property = GetType().GetProperty(propertyName);
+                property.SetValue(this, TypeDescriptor.GetConverter(property.PropertyType).ConvertFrom(value), null);
+            }
         }
 
         public override string ToString()

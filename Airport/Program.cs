@@ -56,7 +56,11 @@ namespace Airport
 						case "edit":
 							Console.WriteLine("Enter target ID");
 							key = int.Parse(Console.ReadLine());
-							graphCollection.Modify(key, FlightFactory.FlightConsoleInput());
+                            Console.WriteLine("Enter property name");
+							string pName = Console.ReadLine();
+                            Console.WriteLine("Enter property value");
+                            string pVal = Console.ReadLine();
+							graphCollection.Modify(key, pName, pVal);
 							break;
 						case "search":
 							Console.WriteLine("Input Flight Departure City:");
@@ -88,7 +92,7 @@ namespace Airport
 							break;
 					}
 				}
-				catch (Exception ex) { Console.WriteLine(ex.Message); }
+				catch (Exception ex) { Console.WriteLine(ex.StackTrace + ex.Message); }
 			}
 		}
 	}

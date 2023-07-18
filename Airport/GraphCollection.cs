@@ -22,10 +22,16 @@ namespace Airport
             }
         }
 
-        public void Modify(int id, Flight itemNew)
+        public void Modify(int id, string propertyName, object propertyValue)
         {
-            Remove(id);
-            Add(itemNew);
+            foreach (Dictionary<int, Flight> t in _flights.Values)
+            {
+                if (t.ContainsKey(id))
+                {
+                    t[id][propertyName] = propertyValue;
+                    break;
+                }
+            }
         }
 
         public IEnumerable<City> GetCities()
