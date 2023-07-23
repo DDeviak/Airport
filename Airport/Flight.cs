@@ -1,15 +1,15 @@
-﻿using System.ComponentModel;
+﻿using Newtonsoft.Json;
+using System.ComponentModel;
 using System.Reflection;
-using System.Runtime.Serialization;
 
 namespace Airport
 {
-    [DataContract()]
+    [JsonObject(MemberSerialization.Fields)]
     class Flight
     {
-        [DataMember()]
-        public int ID { get; protected set; }
-        [DataMember()]
+        [JsonProperty()]
+        readonly public int ID;
+        [JsonProperty()]
         protected City departureCity;
         public City DepartureCity {
             get { return departureCity; }
@@ -20,7 +20,7 @@ namespace Airport
                 departureCity = value;
             }
         }
-        [DataMember()]
+        [JsonProperty()]
         protected City arrivalCity;
         public City ArrivalCity
         {
@@ -32,7 +32,7 @@ namespace Airport
                 arrivalCity = value;
             }
         }
-        [DataMember()]
+        [JsonProperty()]
         protected DateTime departureDatetime;
         public DateTime DepartureDatetime
         {
@@ -43,7 +43,7 @@ namespace Airport
                 departureDatetime = value;
             }
         }
-        [DataMember()]
+        [JsonProperty()]
         protected DateTime arrivalDatetime;
         public DateTime ArrivalDatetime
         {
@@ -54,7 +54,7 @@ namespace Airport
                 arrivalDatetime = value;
             }
         }
-        [DataMember()]
+        [JsonProperty()]
         protected Airline airline;
         public Airline Airline
         {
@@ -65,7 +65,7 @@ namespace Airport
                 airline = value;
             }
         }
-        [DataMember()]
+        [JsonProperty()]
         protected double price;
         public double Price
         {
@@ -76,16 +76,26 @@ namespace Airport
                 price = double.Round(value, 2);
             }
         }
-
+        [JsonConstructor()]
         public Flight(int id, City departureCity, City arrivalCity, DateTime departureDatetime, DateTime arrivalDatetime, Airline airline, double price)
         {
             this.ID = id;
             this.DepartureCity = departureCity;
             this.ArrivalCity = arrivalCity;
-            this.departureDatetime = departureDatetime;
             this.ArrivalDatetime = arrivalDatetime;
+            this.DepartureDatetime = departureDatetime;
             this.Airline = airline;
             this.Price = price;
+        }
+        public Flight(int id)
+        {
+            this.ID = id;
+            this.departureCity = City.Undefined;
+            this.arrivalCity = City.Undefined;
+            this.departureDatetime = DateTime.MinValue;
+            this.arrivalDatetime = DateTime.MaxValue;
+            this.airline = Airline.Undefined;
+            this.price = 0;
         }
         public object this[string propertyName]
         {
@@ -96,8 +106,15 @@ namespace Airport
             }
             set
             {
-                PropertyInfo property = GetType().GetProperty(propertyName);
-                property.SetValue(this, TypeDescriptor.GetConverter(property.PropertyType).ConvertFrom(value), null);
+                try
+                {
+                    PropertyInfo property = GetType().GetProperty(propertyName);
+                    property.SetValue(this, TypeDescriptor.GetConverter(property.PropertyType).ConvertFrom(value), null);
+                }
+                catch (TargetInvocationException ex)
+                {
+                    throw ex.InnerException;
+                }
             }
         }
 

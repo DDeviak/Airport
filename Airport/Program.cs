@@ -34,19 +34,22 @@ namespace Airport
 			{
 				try
 				{
+					Console.Write("Choose option: ");
 					comand = Console.ReadLine();
 					switch (comand)
 					{
 						case "read":
-							Console.WriteLine("Enter file path");
+							Console.WriteLine("Enter file name:");
 							using (StreamReader sr = File.OpenText(Console.ReadLine())) { graphCollection = (GraphCollection)jsonSerializer.Deserialize(sr, typeof(GraphCollection)); }
 							break;
 						case "write":
-							Console.WriteLine("Enter file path");
+							Console.WriteLine("Enter file name:");
 							using (StreamWriter sw = File.CreateText(Console.ReadLine())) { jsonSerializer.Serialize(sw, graphCollection); }
                             break;
 						case "add":
-							graphCollection.Add(FlightFactory.FlightConsoleInput());
+							Flight t = FlightFactory.FlightConsoleInput();
+							if (t != null)
+								graphCollection.Add(t);
 							break;
 						case "delete":
 							Console.WriteLine("Enter Flight ID");
@@ -92,7 +95,7 @@ namespace Airport
 							break;
 					}
 				}
-				catch (Exception ex) { Console.WriteLine(ex.StackTrace + ex.Message); }
+				catch (Exception ex) { Console.WriteLine(ex.Message); }
 			}
 		}
 	}
