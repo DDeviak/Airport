@@ -26,6 +26,8 @@ namespace Airport
 		static void Main(string[] args)
 		{
 			Menu();
+			jsonSerializer.DateFormatString = "dd/MM/yyyy hh:mm:ss";
+			jsonSerializer.Formatting = Formatting.Indented;
 			GraphCollection graphCollection = new GraphCollection();
 			Pathfinder pathfinder = new Pathfinder(ref graphCollection);
 			int key;

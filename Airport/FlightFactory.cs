@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-using System.Reflection;
-using System.Reflection.Emit;
+﻿using System.Reflection;
 
 namespace Airport
 {
@@ -21,11 +19,11 @@ namespace Airport
                     Console.WriteLine("Input {0}:", props[i].Name);
                     string input = Console.ReadLine();
                     if (input == "cancel") return null;
-                    props[i].SetValue(flight, TypeDescriptor.GetConverter(props[i].PropertyType).ConvertFrom(input), null);
+                    flight.SetProperty(props[i], input);
                 }
-                catch (TargetInvocationException ex)
+                catch (Exception ex)
                 {
-                    Console.WriteLine(ex.InnerException.Message);
+                    Console.WriteLine(ex.Message);
                     i--;
                 }
             }

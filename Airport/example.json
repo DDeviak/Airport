@@ -1,106 +1,92 @@
-{
-  "_flights": {
-    "Chicago": {
-      "1": {
-        "departureCity": 3,
-        "arrivalCity": 5,
-        "departureDatetime": "2023-07-15T00:00:00",
-        "arrivalDatetime": "2023-07-15T05:00:00",
-        "airline": 1,
-        "price": 330.0,
-        "ID": 1
-      },
-      "5": {
-        "departureCity": 3,
-        "arrivalCity": 4,
-        "departureDatetime": "2023-07-14T23:00:00",
-        "arrivalDatetime": "2023-07-15T04:00:00",
-        "airline": 2,
-        "price": 200.0,
-        "ID": 5
-      }
-    },
-    "Houston": {
-      "2": {
-        "departureCity": 4,
-        "arrivalCity": 6,
-        "departureDatetime": "2023-07-15T07:00:00",
-        "arrivalDatetime": "2023-07-15T10:00:00",
-        "airline": 3,
-        "price": 60.0,
-        "ID": 2
-      },
-      "3": {
-        "departureCity": 4,
-        "arrivalCity": 5,
-        "departureDatetime": "2023-07-15T07:00:00",
-        "arrivalDatetime": "2023-07-15T10:00:00",
-        "airline": 14,
-        "price": 200.0,
-        "ID": 3
-      }
-    },
-    "Phoenix": {
-      "4": {
-        "departureCity": 5,
-        "arrivalCity": 6,
-        "departureDatetime": "2023-07-15T07:00:00",
-        "arrivalDatetime": "2023-07-15T10:00:00",
-        "airline": 20,
-        "price": 50.0,
-        "ID": 4
-      }
-    },
-    "LosAngeles": {
-      "6": {
-        "departureCity": 2,
-        "arrivalCity": 5,
-        "departureDatetime": "2023-07-14T21:00:00",
-        "arrivalDatetime": "2023-07-15T02:00:00",
-        "airline": 1,
-        "price": 100.0,
-        "ID": 6
-      },
-      "7": {
-        "departureCity": 2,
-        "arrivalCity": 4,
-        "departureDatetime": "2023-07-14T22:00:00",
-        "arrivalDatetime": "2023-07-15T02:00:00",
-        "airline": 3,
-        "price": 500.0,
-        "ID": 7
-      }
-    },
-    "NewYork": {
-      "8": {
-        "departureCity": 1,
-        "arrivalCity": 3,
-        "departureDatetime": "2023-07-14T14:00:00",
-        "arrivalDatetime": "2023-07-14T19:00:00",
-        "airline": 14,
-        "price": 200.0,
-        "ID": 8
-      },
-      "9": {
-        "departureCity": 1,
-        "arrivalCity": 2,
-        "departureDatetime": "2023-07-14T13:00:00",
-        "arrivalDatetime": "2023-07-14T20:00:00",
-        "airline": 20,
-        "price": 100.0,
-        "ID": 9
-      }
-    },
-    "Philadelphia": {
-      "10": {
-        "departureCity": 6,
-        "arrivalCity": 1,
-        "departureDatetime": "2023-07-15T12:00:00",
-        "arrivalDatetime": "2023-07-15T17:00:00",
-        "airline": 2,
-        "price": 70.0,
-        "ID": 10
-      }
-    }
+[
+  {
+    "ID": 1,
+    "departureCity": "Chicago",
+    "arrivalCity": "Phoenix",
+    "departureDatetime": "15/07/2023 12:00:00",
+    "arrivalDatetime": "15/07/2023 05:00:00",
+    "airline": "Delta",
+    "price": 330.0
+  },
+  {
+    "ID": 5,
+    "departureCity": "Chicago",
+    "arrivalCity": "Houston",
+    "departureDatetime": "14/07/2023 11:00:00",
+    "arrivalDatetime": "15/07/2023 04:00:00",
+    "airline": "AmericanAirlines",
+    "price": 200.0
+  },
+  {
+    "ID": 2,
+    "departureCity": "Houston",
+    "arrivalCity": "Philadelphia",
+    "departureDatetime": "15/07/2023 07:00:00",
+    "arrivalDatetime": "15/07/2023 10:00:00",
+    "airline": "United",
+    "price": 60.0
+  },
+  {
+    "ID": 3,
+    "departureCity": "Houston",
+    "arrivalCity": "Phoenix",
+    "departureDatetime": "15/07/2023 07:00:00",
+    "arrivalDatetime": "15/07/2023 10:00:00",
+    "airline": "ANA",
+    "price": 200.0
+  },
+  {
+    "ID": 4,
+    "departureCity": "Phoenix",
+    "arrivalCity": "Philadelphia",
+    "departureDatetime": "15/07/2023 07:00:00",
+    "arrivalDatetime": "15/07/2023 10:00:00",
+    "airline": "JetBlue",
+    "price": 50.0
+  },
+  {
+    "ID": 6,
+    "departureCity": "LosAngeles",
+    "arrivalCity": "Phoenix",
+    "departureDatetime": "14/07/2023 09:00:00",
+    "arrivalDatetime": "15/07/2023 02:00:00",
+    "airline": "Delta",
+    "price": 100.0
+  },
+  {
+    "ID": 7,
+    "departureCity": "LosAngeles",
+    "arrivalCity": "Houston",
+    "departureDatetime": "14/07/2023 10:00:00",
+    "arrivalDatetime": "15/07/2023 02:00:00",
+    "airline": "United",
+    "price": 500.0
+  },
+  {
+    "ID": 8,
+    "departureCity": "NewYork",
+    "arrivalCity": "Chicago",
+    "departureDatetime": "14/07/2023 02:00:00",
+    "arrivalDatetime": "14/07/2023 07:00:00",
+    "airline": "ANA",
+    "price": 200.0
+  },
+  {
+    "ID": 9,
+    "departureCity": "NewYork",
+    "arrivalCity": "LosAngeles",
+    "departureDatetime": "14/07/2023 01:00:00",
+    "arrivalDatetime": "14/07/2023 08:00:00",
+    "airline": "JetBlue",
+    "price": 100.0
+  },
+  {
+    "ID": 10,
+    "departureCity": "Philadelphia",
+    "arrivalCity": "NewYork",
+    "departureDatetime": "15/07/2023 12:00:00",
+    "arrivalDatetime": "15/07/2023 05:00:00",
+    "airline": "AmericanAirlines",
+    "price": 70.0
   }
-}
+]

@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Airport
 {
+    [JsonConverter(typeof(GraphCollectionConverter))]
     [JsonObject(MemberSerialization.Fields)]
     class GraphCollection
     {
@@ -30,7 +32,12 @@ namespace Airport
             {
                 if (t.ContainsKey(id))
                 {
-                    t[id][propertyName] = propertyValue;
+                    t[id].SetProperty(propertyName, propertyValue);
+                    if(propertyName == "DepartureCity")
+                    {
+                        Add(t[id]);
+                        t.Remove(id);
+                    }
                     break;
                 }
             }
