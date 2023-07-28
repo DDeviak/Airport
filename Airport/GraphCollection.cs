@@ -8,13 +8,13 @@ namespace Airport
     class GraphCollection
     {
         [JsonProperty()]
-        Dictionary<City,Dictionary<int,Flight>> _flights = new Dictionary<City, Dictionary<int, Flight>>();
+        Dictionary<City, Dictionary<int, Flight>> _flights = new Dictionary<City, Dictionary<int, Flight>>();
 
         public void Add(Flight item)
         {
-            if(ContainsID(item.ID)) throw new ArgumentException($"Item with ID:{item.ID} already exist");
-            if(!_flights.ContainsKey(item.DepartureCity)) _flights[item.DepartureCity] = new Dictionary<int,Flight>();
-            _flights[item.DepartureCity][item.ID]=item;
+            if (ContainsID(item.ID)) throw new ArgumentException($"Item with ID:{item.ID} already exist");
+            if (!_flights.ContainsKey(item.DepartureCity)) _flights[item.DepartureCity] = new Dictionary<int, Flight>();
+            _flights[item.DepartureCity][item.ID] = item;
         }
 
         public void Remove(int id)
@@ -33,7 +33,7 @@ namespace Airport
                 if (t.ContainsKey(id))
                 {
                     t[id].SetProperty(propertyName, propertyValue);
-                    if(propertyName == "DepartureCity")
+                    if (propertyName == "DepartureCity")
                     {
                         Add(t[id]);
                         t.Remove(id);
@@ -49,7 +49,7 @@ namespace Airport
             return _flights.Keys;
         }
 
-        public IEnumerable<Flight> GetFlightsByCity(City city) 
+        public IEnumerable<Flight> GetFlightsByCity(City city)
         {
             if (_flights.ContainsKey(city))
                 return _flights[city].Values;

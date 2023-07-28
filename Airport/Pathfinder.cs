@@ -2,27 +2,27 @@
 {
     class Pathfinder
     {
-        GraphCollection _graph;
+        public GraphCollection Graph;
 
         const int _maxTimeBetweenFlights = 7;
         const int _minTimeBetweenFlights = 1;
 
-        public Pathfinder(ref GraphCollection graph)
+        public Pathfinder(GraphCollection graph)
         {
-            _graph = graph;
+            Graph = graph;
         }
 
         public IEnumerable<Flight> GetPath(City from, City to, DateTime date)
         {
             Dictionary<City, ValueTuple<double, Flight, bool>> flags = new Dictionary<City, ValueTuple<double, Flight, bool>>();
 
-            foreach (City t in _graph.GetCities())
+            foreach (City t in Graph.GetCities())
             {
                 flags[t] = new ValueTuple<double, Flight, bool>(double.PositiveInfinity, null, false);
             }
             flags[from] = new ValueTuple<double, Flight, bool>(0, null, false);
 
-            PriorityQueue<City,double> pq = new PriorityQueue<City, double> ();
+            PriorityQueue<City, double> pq = new PriorityQueue<City, double>();
 
             pq.Enqueue(from, 0);
 
@@ -32,7 +32,7 @@
                 currentCity = pq.Dequeue();
                 if (flags[currentCity].Item3) continue;
                 (double, Flight, bool) cf = flags[currentCity];
-                List<Flight> flights = _graph.GetFlightsByCity(currentCity).ToList();
+                List<Flight> flights = Graph.GetFlightsByCity(currentCity).ToList();
                 flights.ForEach((Flight t) =>
                 {
                     if (cf.Item2 != null)
@@ -40,8 +40,8 @@
                         double deltaTime = (t.DepartureDatetime - cf.Item2.ArrivalDatetime).TotalHours;
                         if ((_minTimeBetweenFlights >= deltaTime) || (deltaTime >= _maxTimeBetweenFlights)) return;
                     }
-                    if (t.DepartureDatetime.Date <= date) return;
-                        if (t.Price + cf.Item1 < flags[t.ArrivalCity].Item1)
+                    if (t.DepartureDatetime < date) return;
+                    if (t.Price + cf.Item1 < flags[t.ArrivalCity].Item1)
                     {
                         (double, Flight, bool) f = flags[t.ArrivalCity];
                         f.Item1 = t.Price + cf.Item1;
@@ -57,10 +57,10 @@
             List<Flight> path = new List<Flight>();
 
             currentCity = to;
-            while (currentCity!=from)
+            while (currentCity != from)
             {
                 (double, Flight, bool) f = flags[currentCity];
-                if(f.Item2 == null) { throw new Exception("Path not found"); }
+                if (f.Item2 == null) { throw new Exception("Path not found"); }
                 path.Add(f.Item2);
                 currentCity = f.Item2.DepartureCity;
             }
@@ -70,5 +70,23 @@
             return path;
         }
 
+        public IEnumerable<KeyValuePair<DateTime, IEnumerable<Flight>>> GetFlightsByMonth(City departureCity, City arrivalCity, int year, int month)
+        {
+            Dictionary<DateTime, IEnumerable<Flight>> flightsByDays = new Dictionary<DateTime, IEnumerable<Flight>>();
+
+            for (int i = 1; i <= DateTime.DaysInMonth(year, month); i++)
+            {
+                DateTime date = new DateTime(year, month, i); try
+                {
+                    flightsByDays[date] = GetPath(departureCity, arrivalCity, date);
+                }
+                catch
+                {
+                    flightsByDays[date] = null;
+                }
+            }
+
+            return flightsByDays;
+        }
     }
 }
