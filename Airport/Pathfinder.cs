@@ -9,10 +9,11 @@
 
         public Pathfinder(GraphCollection graph)
         {
+            Country.Initialize();
             Graph = graph;
         }
 
-        public IEnumerable<Flight> GetPath(City from, City to, DateTime date)
+        protected Dictionary<City, ValueTuple<double, Flight, bool>> Dijkstra(City from, DateTime date)
         {
             Dictionary<City, ValueTuple<double, Flight, bool>> flags = new Dictionary<City, ValueTuple<double, Flight, bool>>();
 
@@ -54,9 +55,14 @@
                 flags[currentCity] = cf;
             }
 
+            return flags;
+        }
+
+        protected IEnumerable<Flight> MakePath(Dictionary<City, ValueTuple<double, Flight, bool>> flags, City from, City to)
+        {
             List<Flight> path = new List<Flight>();
 
-            currentCity = to;
+            City currentCity = to;
             while (currentCity != from)
             {
                 (double, Flight, bool) f = flags[currentCity];
@@ -66,8 +72,12 @@
             }
 
             path.Reverse();
-
             return path;
+        }
+
+        public IEnumerable<Flight> GetPath(City from, City to, DateTime date)
+        {
+            return MakePath(Dijkstra(from, date),from, to);
         }
 
         public IEnumerable<KeyValuePair<DateTime, IEnumerable<Flight>>> GetFlightsByMonth(City departureCity, City arrivalCity, int year, int month)
@@ -76,7 +86,8 @@
 
             for (int i = 1; i <= DateTime.DaysInMonth(year, month); i++)
             {
-                DateTime date = new DateTime(year, month, i); try
+                DateTime date = new DateTime(year, month, i); 
+                try
                 {
                     flightsByDays[date] = GetPath(departureCity, arrivalCity, date);
                 }
@@ -87,6 +98,23 @@
             }
 
             return flightsByDays;
+        }
+
+        public IEnumerable<KeyValuePair<City, IEnumerable<Flight>>> GetFlightsToCountry(City departureCity, string arrivalCountry, DateTime date)
+        {
+            Dictionary<City, ValueTuple<double, Flight, bool>> flags = Dijkstra(departureCity, date);
+            
+            Dictionary<City, IEnumerable<Flight>> flightsByCity = new Dictionary<City, IEnumerable<Flight>>();
+            
+            foreach (City arrivalCity in Country.GetCitiesByCountry(arrivalCountry))
+            {
+                try
+                {
+                    flightsByCity.Add(arrivalCity, MakePath(flags, departureCity, arrivalCity));
+                }
+                catch { }
+            }
+            return flightsByCity;
         }
     }
 }

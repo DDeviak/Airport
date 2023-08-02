@@ -109,7 +109,18 @@ namespace Airport
                             });
                             break;
                         case "by country":
-                            //TODO
+                            Console.WriteLine("Input Flight Departure City:");
+                            departureCity = Enum.Parse<City>(Console.ReadLine());
+                            Console.WriteLine("Input Flight Arrival Country:");
+                            string arrivalCountry = Console.ReadLine();
+                            Console.WriteLine("Input Flight Departure Datetime:");
+                            departureDatetime = DateTime.Parse(Console.ReadLine());
+
+                            pathfinder.GetFlightsToCountry(departureCity,arrivalCountry,departureDatetime).ToList().ForEach(fbc =>
+                            {
+                                Console.WriteLine(fbc.Key);
+                                fbc.Value.ToList().ForEach(t => Console.WriteLine("\t" + t));
+                            });
                             break;
                         case "output":
                             foreach (City city in pathfinder.Graph.GetCities())
