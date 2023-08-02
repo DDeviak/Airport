@@ -36,12 +36,16 @@
                 List<Flight> flights = Graph.GetFlightsByCity(currentCity).ToList();
                 flights.ForEach((Flight t) =>
                 {
+                    if (currentCity == from) 
+                    {
+                        double deltaTime = (t.DepartureDatetime - date).TotalHours;
+                        if ((deltaTime < 0) || (deltaTime > 24)) return; 
+                    }
                     if (cf.Item2 != null)
                     {
                         double deltaTime = (t.DepartureDatetime - cf.Item2.ArrivalDatetime).TotalHours;
-                        if ((_minTimeBetweenFlights >= deltaTime) || (deltaTime >= _maxTimeBetweenFlights)) return;
+                        if ((_minTimeBetweenFlights > deltaTime) || (deltaTime > _maxTimeBetweenFlights)) return;
                     }
-                    if (t.DepartureDatetime < date) return;
                     if (t.Price + cf.Item1 < flags[t.ArrivalCity].Item1)
                     {
                         (double, Flight, bool) f = flags[t.ArrivalCity];

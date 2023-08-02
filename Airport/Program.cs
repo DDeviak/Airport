@@ -99,7 +99,7 @@ namespace Airport
                             Month month = Enum.Parse<Month>(Console.ReadLine());
                             pathfinder.GetFlightsByMonth(departureCity, arrivalCity, year, (int)month).ToList().ForEach(fbd =>
                             {
-                                Console.WriteLine(fbd.Key);
+                                Console.WriteLine(fbd.Key.ToShortDateString());
                                 if (fbd.Value == null)
                                 {
                                     Console.WriteLine("\tNo flights this day");
