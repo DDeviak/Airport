@@ -54,7 +54,22 @@ namespace Airport
                     {
                         case "read":
                             Console.WriteLine("Enter file name:");
-                            using (StreamReader sr = File.OpenText(Console.ReadLine())) { pathfinder.Graph = (GraphCollection)jsonSerializer.Deserialize(sr, typeof(GraphCollection)); }
+                            using (StreamReader sr = File.OpenText(Console.ReadLine())) 
+                            {
+                                foreach (Flight temp in (Flight[])jsonSerializer.Deserialize(sr, typeof(Flight[])))
+                                {
+                                    try
+                                    {
+                                        pathfinder.Graph.Add(temp);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine(ex.Message);
+                                        Console.WriteLine(temp);
+                                        Console.WriteLine("Record won`t be added to collection");
+                                    }
+                                } 
+                            }
                             break;
                         case "write":
                             Console.WriteLine("Enter file name:");
