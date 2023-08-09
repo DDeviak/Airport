@@ -6,7 +6,7 @@ using System.Reflection;
 namespace Airport
 {
     [JsonObject(MemberSerialization.Fields)]
-    class Flight
+    public class Flight
     {
         readonly public int ID;
         [JsonConverter(typeof(StringEnumConverter))]

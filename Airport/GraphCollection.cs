@@ -5,7 +5,7 @@ namespace Airport
 {
     [JsonConverter(typeof(GraphCollectionConverter))]
     [JsonObject(MemberSerialization.Fields)]
-    class GraphCollection
+    public class GraphCollection
     {
         [JsonProperty()]
         Dictionary<City, Dictionary<int, Flight>> _flights = new Dictionary<City, Dictionary<int, Flight>>();

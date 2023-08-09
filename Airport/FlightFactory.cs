@@ -2,7 +2,7 @@
 
 namespace Airport
 {
-    class FlightFactory
+    internal class FlightFactory
     {
         static public Flight FlightConsoleInput()
         {

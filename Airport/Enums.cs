@@ -1,6 +1,10 @@
-﻿namespace Airport
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+namespace Airport
 {
-    enum City
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum City
     {
         Undefined = 0,
         NewYork,
@@ -90,7 +94,8 @@
         Singapore
     }
 
-    enum Airline
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum Airline
     {
         Undefined = 0,
         Delta,

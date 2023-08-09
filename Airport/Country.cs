@@ -4,7 +4,7 @@ using System.Reflection;
 namespace Airport
 {
     [JsonObject]
-    class Country
+    public class Country
     {
         static public Dictionary<string, Country> Countries { get; protected set; }
         static public void Initialize()

@@ -1,6 +1,6 @@
 ﻿namespace Airport
 {
-    class Pathfinder
+    public class Pathfinder
     {
         public GraphCollection Graph;
 
