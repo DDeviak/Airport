@@ -26,6 +26,16 @@ namespace Airport
             throw new ArgumentException($"Item with ID:{id} doesn`t exist");
         }
 
+        public Flight Get(int id)
+        {
+            Flight? result;
+            foreach (Dictionary<int, Flight> t in _flights.Values)
+            {
+                if (t.TryGetValue(id, out result)) return result;
+            }
+            throw new ArgumentException($"Item with ID:{id} doesn`t exist");
+        }
+
         public void Modify(int id, string propertyName, object propertyValue)
         {
             foreach (Dictionary<int, Flight> t in _flights.Values)

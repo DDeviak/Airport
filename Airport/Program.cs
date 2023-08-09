@@ -54,7 +54,7 @@ namespace Airport
                     {
                         case "read":
                             Console.WriteLine("Enter file name:");
-                            using (StreamReader sr = File.OpenText(Console.ReadLine())) 
+                            using (StreamReader sr = File.OpenText(Console.ReadLine()))
                             {
                                 foreach (Flight temp in (Flight[])jsonSerializer.Deserialize(sr, typeof(Flight[])))
                                 {
@@ -68,7 +68,7 @@ namespace Airport
                                         Console.WriteLine(temp);
                                         Console.WriteLine("Record won`t be added to collection");
                                     }
-                                } 
+                                }
                             }
                             break;
                         case "write":
@@ -101,7 +101,12 @@ namespace Airport
                             City arrivalCity = Enum.Parse<City>(Console.ReadLine());
                             Console.WriteLine("Input Flight Departure Datetime:");
                             DateTime departureDatetime = DateTime.Parse(Console.ReadLine());
-                            pathfinder.GetPath(departureCity, arrivalCity, departureDatetime).ToList().ForEach(t => Console.WriteLine(t));
+                            List<Flight>? path = pathfinder.GetPath(departureCity, arrivalCity, departureDatetime).ToList();
+                            if (path != null)
+                            {
+                                path.ForEach(t => Console.WriteLine(t));
+                            }
+                            else { Console.WriteLine("Path not found"); }
                             break;
                         case "by month":
                             Console.WriteLine("Input Flight Departure City:");
@@ -131,7 +136,7 @@ namespace Airport
                             Console.WriteLine("Input Flight Departure Datetime:");
                             departureDatetime = DateTime.Parse(Console.ReadLine());
 
-                            pathfinder.GetFlightsToCountry(departureCity,arrivalCountry,departureDatetime).ToList().ForEach(fbc =>
+                            pathfinder.GetFlightsToCountry(departureCity, arrivalCountry, departureDatetime).ToList().ForEach(fbc =>
                             {
                                 Console.WriteLine(fbc.Key);
                                 fbc.Value.ToList().ForEach(t => Console.WriteLine("\t" + t));
@@ -145,7 +150,6 @@ namespace Airport
                             break;
                         case "exit":
                             return;
-                            break;
                         default:
                             Console.WriteLine("Invalid comand");
                             break;

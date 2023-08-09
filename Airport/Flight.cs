@@ -99,14 +99,14 @@ namespace Airport
         {
             try
             {
-                PropertyInfo property = GetType().GetProperty(propertyName);
-                property.SetValue(this, TypeDescriptor.GetConverter(property.PropertyType).ConvertFrom(value), null);
+                PropertyInfo? property = GetType().GetProperty(propertyName);
+                property?.SetValue(this, TypeDescriptor.GetConverter(property.PropertyType).ConvertFrom(value), null);
             }
             catch (TargetInvocationException ex)
             {
                 throw ex.InnerException;
             }
-            catch (NullReferenceException ex)
+            catch (NullReferenceException)
             {
                 throw new KeyNotFoundException("Property with such name doesn`t exist");
             }

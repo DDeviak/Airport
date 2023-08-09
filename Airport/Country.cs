@@ -6,16 +6,24 @@ namespace Airport
     [JsonObject]
     public class Country
     {
-        static public Dictionary<string, Country> Countries { get; protected set; }
+        static internal Dictionary<string, Country>? countries;
+        static public Dictionary<string, Country>? Countries
+        {
+            get
+            {
+                if (countries == null) Initialize();
+                return countries;
+            }
+        }
         static public void Initialize()
         {
-            if (Countries == null)
-                using (StreamReader sr = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("Airport.CountriesConfig.json")))
-                {
-                    JsonSerializer jsonSerializer = new JsonSerializer();
-                    jsonSerializer.Formatting = Formatting.Indented;
-                    Countries = (Dictionary<string, Country>)jsonSerializer.Deserialize(sr, typeof(Dictionary<string, Country>));
-                }
+            using (Stream? stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Airport.CountriesConfig.json"))
+            using (StreamReader sr = new StreamReader(stream))
+            {
+                JsonSerializer jsonSerializer = new JsonSerializer();
+                jsonSerializer.Formatting = Formatting.Indented;
+                countries = (Dictionary<string, Country>)jsonSerializer.Deserialize(sr, typeof(Dictionary<string, Country>));
+            }
         }
         static public IEnumerable<City> GetCitiesByCountry(string country)
         {
