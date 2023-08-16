@@ -3,7 +3,7 @@
     "ID": 1,
     "departureCity": "Chicago",
     "arrivalCity": "Phoenix",
-    "departureDatetime": "15/07/2023 12:00:00",
+    "departureDatetime": "15/07/2023 00:00:00",
     "arrivalDatetime": "15/07/2023 05:00:00",
     "airline": "Delta",
     "price": 330.0
@@ -84,7 +84,7 @@
     "ID": 10,
     "departureCity": "Philadelphia",
     "arrivalCity": "NewYork",
-    "departureDatetime": "15/07/2023 12:00:00",
+    "departureDatetime": "15/07/2023 00:00:00",
     "arrivalDatetime": "15/07/2023 05:00:00",
     "airline": "AmericanAirlines",
     "price": 70.0

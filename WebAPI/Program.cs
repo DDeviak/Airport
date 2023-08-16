@@ -1,6 +1,5 @@
 using Airport;
 using Newtonsoft.Json.Converters;
-using System.Reflection;
 
 namespace WebAPI
 {
@@ -16,7 +15,7 @@ namespace WebAPI
             {
                 opts.SerializerSettings.Converters.Add(new StringEnumConverter(camelCaseText: true));
                 opts.SerializerSettings.Converters.Add(new GraphCollectionConverter());
-                opts.SerializerSettings.DateFormatString = "dd/MM/yyyy hh:mm:ss";
+                opts.SerializerSettings.DateFormatString = "dd/MM/yyyy HH:mm:ss";
                 opts.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented;
             });
             builder.Services.AddEndpointsApiExplorer();

@@ -78,13 +78,16 @@
             return path;
         }
 
-        public IEnumerable<Flight>? GetPath(City from, City to, DateTime date)
+        public IEnumerable<Flight>? GetPath(City departureCity, City arrivalCity, DateTime date)
         {
-            return MakePath(Dijkstra(from, date), from, to);
+            if (departureCity == arrivalCity) throw new ArgumentException("DepartureCity and ArrivalCity can`t be equal");
+            return MakePath(Dijkstra(departureCity, date), departureCity, arrivalCity);
         }
 
-        public IEnumerable<KeyValuePair<DateTime, IEnumerable<Flight>?>> GetFlightsByMonth(City departureCity, City arrivalCity, int year, int month)
+        public IDictionary<DateTime, IEnumerable<Flight>?> GetFlightsByMonth(City departureCity, City arrivalCity, int year, int month)
         {
+            if (departureCity == arrivalCity) throw new ArgumentException("DepartureCity and ArrivalCity can`t be equal");
+
             Dictionary<DateTime, IEnumerable<Flight>?> flightsByDays = new Dictionary<DateTime, IEnumerable<Flight>?>();
 
             for (int i = 1; i <= DateTime.DaysInMonth(year, month); i++)
@@ -96,17 +99,22 @@
             return flightsByDays;
         }
 
-        public IEnumerable<KeyValuePair<City, IEnumerable<Flight>?>> GetFlightsToCountry(City departureCity, string arrivalCountry, DateTime date)
+        public IDictionary<City, IEnumerable<Flight>?> GetFlightsToCountry(City departureCity, string arrivalCountry, DateTime date)
         {
+            if (Country.IsExist(arrivalCountry)) throw new ArgumentException($"Country named \"{arrivalCountry}\" doesn`t exist");
+
             Dictionary<City, ValueTuple<double, Flight?, bool>> flags = Dijkstra(departureCity, date);
 
             Dictionary<City, IEnumerable<Flight>?> flightsByCity = new Dictionary<City, IEnumerable<Flight>?>();
 
+            IEnumerable<Flight>? path;
             foreach (City arrivalCity in Country.GetCitiesByCountry(arrivalCountry))
             {
                 try
                 {
-                    flightsByCity.Add(arrivalCity, MakePath(flags, departureCity, arrivalCity));
+                    path = MakePath(flags, departureCity, arrivalCity);
+                    if (path != null)
+                        flightsByCity.Add(arrivalCity, path);
                 }
                 catch { }
             }

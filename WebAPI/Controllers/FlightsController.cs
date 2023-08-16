@@ -1,7 +1,8 @@
 ﻿using Airport;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Mime;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace WebAPI.Controllers
 {
@@ -9,36 +10,105 @@ namespace WebAPI.Controllers
     [ApiController]
     public class FlightsController : ControllerBase
     {
-        // GET: api/<FlightsController>
         [HttpGet]
-        public GraphCollection Get()
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Flight>))]
+        public async Task<IActionResult> Get()
         {
-            return Program.Pathfinder.Graph;
+            return Ok(await Task.Run(() => Program.Pathfinder.Graph.AsEnumerable()));
         }
-        // GET: api/<FlightsController>/5
+
         [HttpGet("{id}")]
-        public Flight Get(int id)
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Flight))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Get(int id)
         {
-            return Program.Pathfinder.Graph.Get(id);
+            try
+            {
+                return Ok(await Task.Run(() => Program.Pathfinder.Graph.Get(id)));
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
         }
-        // POST api/<FlightsController>
+
         [HttpPost]
-        public void Post([FromBody] Flight value)
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Post([FromBody] Flight value)
         {
-            Program.Pathfinder.Graph.Add(value);
+            try
+            {
+                await Task.Run(() => Program.Pathfinder.Graph.Add(value));
+                return CreatedAtAction(nameof(Get), new { id = value.ID }, value);
+            }
+            catch (ArgumentException)
+            {
+                return BadRequest();
+            }
         }
-        // PATCH api/<FlightsController>/5
+
+        [HttpPut("{id}")]
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Put(int id, [FromBody] Flight value)
+        {
+            try
+            {
+                await Task.Run(() => Program.Pathfinder.Graph.Replace(id, value));
+                return Ok();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (ArgumentException)
+            {
+                return BadRequest();
+            }
+        }
+
         [HttpPatch("{id}")]
-        public void Patch(int id, [FromBody] Changes value)
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Patch(int id, [FromBody] JsonPatchDocument<Flight> patch)
         {
-            Program.Pathfinder.Graph.Modify(id, value.FieldName, value.Value);
+            try
+            {
+                patch.ApplyTo(await Task.Run(() => Program.Pathfinder.Graph.Get(id)), ModelState);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                return Ok();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
         }
-        public record Changes(string FieldName, object Value);
-        // DELETE api/<FlightsController>/5
+
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Delete(int id)
         {
-            Program.Pathfinder.Graph.Remove(id);
+            try
+            {
+                await Task.Run(() => Program.Pathfinder.Graph.Remove(id));
+                return Ok();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
         }
     }
 }

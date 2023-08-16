@@ -25,6 +25,14 @@ namespace Airport
                 countries = (Dictionary<string, Country>)jsonSerializer.Deserialize(sr, typeof(Dictionary<string, Country>));
             }
         }
+        static public IEnumerable<Country> GetAll()
+        {
+            return Countries.Values.ToList();
+        }
+        static public Country Get(string country)
+        {
+            return Countries[country];
+        }
         static public IEnumerable<City> GetCitiesByCountry(string country)
         {
             if (!IsExist(country)) throw new ArgumentException($"Country named \"{country}\" doesn`t exist");

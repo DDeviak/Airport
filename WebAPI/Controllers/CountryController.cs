@@ -1,7 +1,7 @@
 ﻿using Airport;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Mime;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace WebAPI.Controllers
 {
@@ -9,18 +9,28 @@ namespace WebAPI.Controllers
     [ApiController]
     public class CountryController : ControllerBase
     {
-        // GET: api/<CountryController>
         [HttpGet]
-        public IEnumerable<Country> Get()
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Country>))]
+        public async Task<IActionResult> Get()
         {
-            return Country.Countries.Values.ToList();
+            return Ok(await Task.Run(() => Country.GetAll()));
         }
 
-        // GET api/<CountryController>/5
         [HttpGet("{name}")]
-        public Country Get(string name)
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Country))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Get(string name)
         {
-            return Country.Countries[name];
+            try
+            {
+                return Ok(await Task.Run(() => Country.Get(name)));
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Airport;
 using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using System.Net.Mime;
 
 namespace WebAPI.Controllers
 {
@@ -9,23 +8,61 @@ namespace WebAPI.Controllers
     [ApiController]
     public class PathfinderController : ControllerBase
     {
-        // GET: api/<PathfinderController>
         [HttpGet]
-        public IEnumerable<Flight> Get([FromQuery] City departureCity, [FromQuery] City arrivalCity, [FromQuery] DateOnly departureDate)
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Flight>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Get([FromQuery] City departureCity, [FromQuery] City arrivalCity, [FromQuery] DateOnly departureDate)
         {
-            return Program.Pathfinder.GetPath(departureCity, arrivalCity, departureDate.ToDateTime(new TimeOnly()));
+            try
+            {
+                IEnumerable<Flight>? path = await Task.Run(() => Program.Pathfinder.GetPath(departureCity, arrivalCity, departureDate.ToDateTime(new TimeOnly())));
+                if (path != null) return Ok(path);
+                else return NotFound();
+            }
+            catch (ArgumentException)
+            {
+                return BadRequest();
+            }
         }
-        // GET: api/<PathfinderController>/byCountry
+
         [HttpGet("byCountry")]
-        public IEnumerable<KeyValuePair<City,IEnumerable<Flight>?>> Get([FromQuery] City departureCity, [FromQuery] string arrivalCountry, [FromQuery] DateOnly departureDate)
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IDictionary<City, IEnumerable<Flight>?>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Get([FromQuery] City departureCity, [FromQuery] string arrivalCountry, [FromQuery] DateOnly departureDate)
         {
-            return Program.Pathfinder.GetFlightsToCountry(departureCity, arrivalCountry, departureDate.ToDateTime(new TimeOnly()));
+            try
+            {
+                IDictionary<City, IEnumerable<Flight>?> pathes = await Task.Run(() => Program.Pathfinder.GetFlightsToCountry(departureCity, arrivalCountry, departureDate.ToDateTime(new TimeOnly())));
+                if (pathes.Count != 0) return Ok(pathes);
+                else return NotFound();
+            }
+            catch (ArgumentException)
+            {
+                return BadRequest();
+            }
         }
-        // GET: api/<PathfinderController>/byMonth
+
         [HttpGet("byMonth")]
-        public IEnumerable<KeyValuePair<DateTime, IEnumerable<Flight>?>> Get([FromQuery] City departureCity, [FromQuery] City arrivalCity, [FromQuery] int year, [FromQuery]int month)
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IDictionary<DateTime, IEnumerable<Flight>?>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Get([FromQuery] City departureCity, [FromQuery] City arrivalCity, [FromQuery] int year, [FromQuery] int month)
         {
-            return Program.Pathfinder.GetFlightsByMonth(departureCity, arrivalCity, year, month);
+            try
+            {
+                IDictionary<DateTime, IEnumerable<Flight>?> pathes = await Task.Run(() => Program.Pathfinder.GetFlightsByMonth(departureCity, arrivalCity, year, month));
+                if (pathes.Any(t => t.Value != null)) return Ok(pathes);
+                else return NotFound();
+            }
+            catch (ArgumentException)
+            {
+                return BadRequest();
+            }
         }
     }
 }

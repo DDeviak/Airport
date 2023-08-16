@@ -19,11 +19,15 @@ namespace Airport
 
         public void Remove(int id)
         {
-            foreach (Dictionary<int, Flight> t in _flights.Values)
+            foreach (KeyValuePair<City, Dictionary<int, Flight>> t in _flights)
             {
-                if (t.Remove(id)) break;
+                if (t.Value.Remove(id))
+                {
+                    if (t.Value.Count == 0) _flights.Remove(t.Key);
+                    return;
+                }
             }
-            throw new ArgumentException($"Item with ID:{id} doesn`t exist");
+            throw new KeyNotFoundException($"Item with ID:{id} doesn`t exist");
         }
 
         public Flight Get(int id)
@@ -33,7 +37,13 @@ namespace Airport
             {
                 if (t.TryGetValue(id, out result)) return result;
             }
-            throw new ArgumentException($"Item with ID:{id} doesn`t exist");
+            throw new KeyNotFoundException($"Item with ID:{id} doesn`t exist");
+        }
+
+        public void Replace(int id, Flight value)
+        {
+            Remove(id);
+            Add(value);
         }
 
         public void Modify(int id, string propertyName, object propertyValue)
@@ -51,7 +61,7 @@ namespace Airport
                     break;
                 }
             }
-            throw new ArgumentException($"Item with ID:{id} doesn`t exist");
+            throw new KeyNotFoundException($"Item with ID:{id} doesn`t exist");
         }
 
         public IEnumerable<City> GetCities()
@@ -73,6 +83,16 @@ namespace Airport
                 if (t.ContainsKey(id)) return true;
             }
             return false;
+        }
+
+        public IEnumerable<Flight> AsEnumerable()
+        {
+            List<Flight> flights = new List<Flight>();
+            foreach (Dictionary<int, Flight> t in _flights.Values)
+            {
+                flights.AddRange(t.Values);
+            }
+            return flights;
         }
     }
 }
