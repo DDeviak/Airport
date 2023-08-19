@@ -4,14 +4,14 @@ namespace Airport
 {
     public class GraphCollectionConverter : JsonConverter
     {
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
-            GraphCollection gc = (GraphCollection)value;
+            GraphCollection gc = ((GraphCollection?)value ?? new GraphCollection());
 
             writer.WriteStartArray();
-            foreach (City city in gc.GetCities())
+            foreach (City city in gc.GetNodes())
             {
-                foreach (Flight flights in gc.GetFlightsByCity(city))
+                foreach (Flight flights in gc.GetOutcomingArcs(city))
                 {
                     serializer.Serialize(writer, flights);
                 }
@@ -19,11 +19,11 @@ namespace Airport
             writer.WriteEndArray();
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             GraphCollection gc = new GraphCollection();
 
-            foreach (Flight t in serializer.Deserialize<Flight[]>(reader))
+            foreach (Flight t in serializer.Deserialize<Flight[]>(reader) ?? new Flight[0])
             {
                 gc.Add(t);
             }

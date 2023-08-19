@@ -5,7 +5,7 @@ namespace Airport
 {
     [JsonConverter(typeof(GraphCollectionConverter))]
     [JsonObject(MemberSerialization.Fields)]
-    public class GraphCollection
+    public class GraphCollection : IGraphProvider<City, Flight>
     {
         [JsonProperty()]
         Dictionary<City, Dictionary<int, Flight>> _flights = new Dictionary<City, Dictionary<int, Flight>>();
@@ -64,12 +64,12 @@ namespace Airport
             throw new KeyNotFoundException($"Item with ID:{id} doesn`t exist");
         }
 
-        public IEnumerable<City> GetCities()
+        public IEnumerable<City> GetNodes()
         {
             return _flights.Keys;
         }
 
-        public IEnumerable<Flight> GetFlightsByCity(City city)
+        public IEnumerable<Flight> GetOutcomingArcs(City city)
         {
             if (_flights.ContainsKey(city))
                 return _flights[city].Values;

@@ -1,83 +1,31 @@
-﻿namespace Airport
-{
-    public class Pathfinder
-    {
-        public GraphCollection Graph;
+﻿using Pathfinding;
 
+namespace Airport
+{
+    public class Pathfinder : PathfinderBase<City, Flight>
+    {
         const int _maxTimeBetweenFlights = 7;
         const int _minTimeBetweenFlights = 1;
 
-        public Pathfinder(GraphCollection graph)
+        public Pathfinder(GraphCollection graph) : base(graph) { }
+
+        protected Dictionary<City, Flags> Dijkstra(City from, DateTime date)
         {
-            Graph = graph;
-        }
-
-        protected Dictionary<City, ValueTuple<double, Flight?, bool>> Dijkstra(City from, DateTime date)
-        {
-            Dictionary<City, ValueTuple<double, Flight?, bool>> flags = new Dictionary<City, ValueTuple<double, Flight?, bool>>();
-
-            foreach (City t in Graph.GetCities())
+            return Dijkstra(from, (current, t) =>
             {
-                flags[t] = new ValueTuple<double, Flight?, bool>(double.PositiveInfinity, null, false);
-            }
-            flags[from] = new ValueTuple<double, Flight?, bool>(0, null, false);
-
-            PriorityQueue<City, double> pq = new PriorityQueue<City, double>();
-
-            pq.Enqueue(from, 0);
-
-            City currentCity;
-            while (pq.Count > 0)
-            {
-                currentCity = pq.Dequeue();
-                if (flags[currentCity].Item3) continue;
-                (double, Flight?, bool) cf = flags[currentCity];
-                List<Flight> flights = Graph.GetFlightsByCity(currentCity).ToList();
-                flights.ForEach((Flight t) =>
+                if (t.DepartureCity == from)
                 {
-                    if (currentCity == from)
-                    {
-                        double deltaTime = (t.DepartureDatetime - date).TotalHours;
-                        if ((deltaTime < 0) || (deltaTime > 24)) return;
-                    }
-                    if (cf.Item2 != null)
-                    {
-                        double deltaTime = (t.DepartureDatetime - cf.Item2.ArrivalDatetime).TotalHours;
-                        if ((_minTimeBetweenFlights > deltaTime) || (deltaTime > _maxTimeBetweenFlights)) return;
-                    }
-                    if (t.Price + cf.Item1 < flags[t.ArrivalCity].Item1)
-                    {
-                        (double, Flight?, bool) f = flags[t.ArrivalCity];
-                        f.Item1 = t.Price + cf.Item1;
-                        f.Item2 = t;
-                        flags[t.ArrivalCity] = f;
-                        pq.Enqueue(t.ArrivalCity, f.Item1);
-                    }
-                });
-                cf.Item3 = true;
-                flags[currentCity] = cf;
-            }
-
-            return flags;
+                    double deltaTime = (t.DepartureDatetime - date).TotalHours;
+                    if ((deltaTime < 0) || (deltaTime > 24)) return false;
+                }
+                if (current != null)
+                {
+                    double deltaTime = (t.DepartureDatetime - current.ArrivalDatetime).TotalHours;
+                    if ((_minTimeBetweenFlights > deltaTime) || (deltaTime > _maxTimeBetweenFlights)) return false;
+                }
+                return true;
+            });
         }
-
-        protected IEnumerable<Flight>? MakePath(Dictionary<City, ValueTuple<double, Flight?, bool>> flags, City from, City to)
-        {
-            List<Flight> path = new List<Flight>();
-
-            City currentCity = to;
-            while (currentCity != from)
-            {
-                (double, Flight?, bool) f = flags[currentCity];
-                if (f.Item2 == null) return null;
-                path.Add(f.Item2);
-                currentCity = f.Item2.DepartureCity;
-            }
-
-            path.Reverse();
-            return path;
-        }
-
         public IEnumerable<Flight>? GetPath(City departureCity, City arrivalCity, DateTime date)
         {
             if (departureCity == arrivalCity) throw new ArgumentException("DepartureCity and ArrivalCity can`t be equal");
@@ -103,7 +51,7 @@
         {
             if (Country.IsExist(arrivalCountry)) throw new ArgumentException($"Country named \"{arrivalCountry}\" doesn`t exist");
 
-            Dictionary<City, ValueTuple<double, Flight?, bool>> flags = Dijkstra(departureCity, date);
+            Dictionary<City, Flags> flags = Dijkstra(departureCity, date);
 
             Dictionary<City, IEnumerable<Flight>?> flightsByCity = new Dictionary<City, IEnumerable<Flight>?>();
 

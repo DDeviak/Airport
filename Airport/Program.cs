@@ -49,18 +49,18 @@ namespace Airport
                 try
                 {
                     Console.Write("Choose option: ");
-                    comand = Console.ReadLine();
+                    comand = Console.ReadLine() ?? string.Empty;
                     switch (comand)
                     {
                         case "read":
                             Console.WriteLine("Enter file name:");
-                            using (StreamReader sr = File.OpenText(Console.ReadLine()))
+                            using (StreamReader sr = File.OpenText(Console.ReadLine() ?? string.Empty))
                             {
-                                foreach (Flight temp in (Flight[])jsonSerializer.Deserialize(sr, typeof(Flight[])))
+                                foreach (Flight temp in ((Flight[]?)jsonSerializer.Deserialize(sr, typeof(Flight[])) ?? new Flight[0]))
                                 {
                                     try
                                     {
-                                        pathfinder.Graph.Add(temp);
+                                        ((GraphCollection)pathfinder.Graph).Add(temp);
                                     }
                                     catch (Exception ex)
                                     {
@@ -73,35 +73,35 @@ namespace Airport
                             break;
                         case "write":
                             Console.WriteLine("Enter file name:");
-                            using (StreamWriter sw = File.CreateText(Console.ReadLine())) { jsonSerializer.Serialize(sw, pathfinder.Graph); }
+                            using (StreamWriter sw = File.CreateText(Console.ReadLine() ?? string.Empty)) { jsonSerializer.Serialize(sw, pathfinder.Graph); }
                             break;
                         case "add":
-                            Flight t = FlightFactory.FlightConsoleInput();
+                            Flight? t = FlightFactory.FlightConsoleInput();
                             if (t != null)
-                                pathfinder.Graph.Add(t);
+                                ((GraphCollection)pathfinder.Graph).Add(t);
                             break;
                         case "delete":
                             Console.WriteLine("Enter Flight ID");
-                            key = int.Parse(Console.ReadLine());
-                            pathfinder.Graph.Remove(key);
+                            key = int.Parse(Console.ReadLine() ?? string.Empty);
+                            ((GraphCollection)pathfinder.Graph).Remove(key);
                             break;
                         case "edit":
                             Console.WriteLine("Enter target ID");
-                            key = int.Parse(Console.ReadLine());
+                            key = int.Parse(Console.ReadLine() ?? string.Empty);
                             Console.WriteLine("Enter property name");
-                            string pName = Console.ReadLine();
+                            string pName = Console.ReadLine() ?? string.Empty;
                             Console.WriteLine("Enter property value");
-                            string pVal = Console.ReadLine();
-                            pathfinder.Graph.Modify(key, pName, pVal);
+                            string pVal = Console.ReadLine() ?? string.Empty;
+                            ((GraphCollection)pathfinder.Graph).Modify(key, pName, pVal);
                             break;
                         case "search":
                             Console.WriteLine("Input Flight Departure City:");
-                            City departureCity = Enum.Parse<City>(Console.ReadLine());
+                            City departureCity = Enum.Parse<City>(Console.ReadLine() ?? string.Empty);
                             Console.WriteLine("Input Flight Arrival City:");
-                            City arrivalCity = Enum.Parse<City>(Console.ReadLine());
+                            City arrivalCity = Enum.Parse<City>(Console.ReadLine() ?? string.Empty);
                             Console.WriteLine("Input Flight Departure Datetime:");
-                            DateTime departureDatetime = DateTime.Parse(Console.ReadLine());
-                            List<Flight>? path = pathfinder.GetPath(departureCity, arrivalCity, departureDatetime).ToList();
+                            DateTime departureDatetime = DateTime.Parse(Console.ReadLine() ?? string.Empty);
+                            List<Flight>? path = pathfinder.GetPath(departureCity, arrivalCity, departureDatetime)?.ToList();
                             if (path != null)
                             {
                                 path.ForEach(t => Console.WriteLine(t));
@@ -110,13 +110,13 @@ namespace Airport
                             break;
                         case "by month":
                             Console.WriteLine("Input Flight Departure City:");
-                            departureCity = Enum.Parse<City>(Console.ReadLine());
+                            departureCity = Enum.Parse<City>(Console.ReadLine() ?? string.Empty);
                             Console.WriteLine("Input Flight Arrival City:");
-                            arrivalCity = Enum.Parse<City>(Console.ReadLine());
+                            arrivalCity = Enum.Parse<City>(Console.ReadLine() ?? string.Empty);
                             Console.WriteLine("Input Flight Departure Year:");
-                            int year = int.Parse(Console.ReadLine());
+                            int year = int.Parse(Console.ReadLine() ?? string.Empty);
                             Console.WriteLine("Input Flight Departure Month:");
-                            Month month = Enum.Parse<Month>(Console.ReadLine());
+                            Month month = Enum.Parse<Month>(Console.ReadLine() ?? string.Empty);
                             pathfinder.GetFlightsByMonth(departureCity, arrivalCity, year, (int)month).ToList().ForEach(fbd =>
                             {
                                 Console.WriteLine(fbd.Key.ToShortDateString());
@@ -130,23 +130,20 @@ namespace Airport
                             break;
                         case "by country":
                             Console.WriteLine("Input Flight Departure City:");
-                            departureCity = Enum.Parse<City>(Console.ReadLine());
+                            departureCity = Enum.Parse<City>(Console.ReadLine() ?? string.Empty);
                             Console.WriteLine("Input Flight Arrival Country:");
-                            string arrivalCountry = Console.ReadLine();
+                            string arrivalCountry = Console.ReadLine() ?? string.Empty;
                             Console.WriteLine("Input Flight Departure Datetime:");
-                            departureDatetime = DateTime.Parse(Console.ReadLine());
+                            departureDatetime = DateTime.Parse(Console.ReadLine() ?? string.Empty);
 
-                            pathfinder.GetFlightsToCountry(departureCity, arrivalCountry, departureDatetime).ToList().ForEach(fbc =>
+                            pathfinder.GetFlightsToCountry(departureCity, arrivalCountry, departureDatetime)?.ToList().ForEach(fbc =>
                             {
                                 Console.WriteLine(fbc.Key);
-                                fbc.Value.ToList().ForEach(t => Console.WriteLine("\t" + t));
+                                fbc.Value?.ToList().ForEach(t => Console.WriteLine("\t" + t));
                             });
                             break;
                         case "output":
-                            foreach (City city in pathfinder.Graph.GetCities())
-                            {
-                                pathfinder.Graph.GetFlightsByCity(city).ToList().ForEach(t => Console.WriteLine(t));
-                            }
+                            ((GraphCollection)pathfinder.Graph).AsEnumerable().ToList().ForEach(t => Console.WriteLine(t));
                             break;
                         case "exit":
                             return;

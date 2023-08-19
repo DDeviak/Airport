@@ -15,7 +15,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Flight>))]
         public async Task<IActionResult> Get()
         {
-            return Ok(await Task.Run(() => Program.Pathfinder.Graph.AsEnumerable()));
+            return Ok(await Task.Run(() => ((GraphCollection)Program.Pathfinder.Graph).AsEnumerable()));
         }
 
         [HttpGet("{id}")]
@@ -26,7 +26,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                return Ok(await Task.Run(() => Program.Pathfinder.Graph.Get(id)));
+                return Ok(await Task.Run(() => ((GraphCollection)Program.Pathfinder.Graph).Get(id)));
             }
             catch (KeyNotFoundException)
             {
@@ -42,7 +42,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                await Task.Run(() => Program.Pathfinder.Graph.Add(value));
+                await Task.Run(() => ((GraphCollection)Program.Pathfinder.Graph).Add(value));
                 return CreatedAtAction(nameof(Get), new { id = value.ID }, value);
             }
             catch (ArgumentException)
@@ -60,7 +60,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                await Task.Run(() => Program.Pathfinder.Graph.Replace(id, value));
+                await Task.Run(() => ((GraphCollection)Program.Pathfinder.Graph).Replace(id, value));
                 return Ok();
             }
             catch (KeyNotFoundException)
@@ -82,7 +82,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                patch.ApplyTo(await Task.Run(() => Program.Pathfinder.Graph.Get(id)), ModelState);
+                patch.ApplyTo(await Task.Run(() => ((GraphCollection)Program.Pathfinder.Graph).Get(id)), ModelState);
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
@@ -102,7 +102,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                await Task.Run(() => Program.Pathfinder.Graph.Remove(id));
+                await Task.Run(() => ((GraphCollection)Program.Pathfinder.Graph).Remove(id));
                 return Ok();
             }
             catch (KeyNotFoundException)

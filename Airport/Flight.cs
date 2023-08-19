@@ -1,12 +1,13 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Pathfinding;
 using System.ComponentModel;
 using System.Reflection;
 
 namespace Airport
 {
     [JsonObject(MemberSerialization.Fields)]
-    public class Flight
+    public class Flight : IArc<City>
     {
         readonly public int ID;
         [JsonConverter(typeof(StringEnumConverter))]
@@ -74,6 +75,11 @@ namespace Airport
                 price = double.Round(value, 2);
             }
         }
+
+        public double Length => price;
+        public City From => departureCity;
+        public City To => arrivalCity;
+
         [JsonConstructor()]
         public Flight(int id, City departureCity, City arrivalCity, DateTime departureDatetime, DateTime arrivalDatetime, Airline airline, double price)
         {
@@ -104,7 +110,7 @@ namespace Airport
             }
             catch (TargetInvocationException ex)
             {
-                throw ex.InnerException;
+                throw ex.InnerException ?? ex;
             }
             catch (NullReferenceException)
             {
@@ -119,13 +125,13 @@ namespace Airport
             }
             catch (TargetInvocationException ex)
             {
-                throw ex.InnerException;
+                throw ex.InnerException ?? ex;
             }
         }
 
         public override string ToString()
         {
-            return String.Format("{0}, {1} - {2}, {3} - {4}, {5}, ${6}", ID, DepartureCity, ArrivalCity, DepartureDatetime, ArrivalDatetime, Airline, Price);
+            return string.Format("{0}, {1} - {2}, {3} - {4}, {5}, ${6}", ID, DepartureCity, ArrivalCity, DepartureDatetime, ArrivalDatetime, Airline, Price);
         }
     }
 }
