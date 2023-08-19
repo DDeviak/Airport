@@ -49,7 +49,7 @@ namespace Airport
 
         public IDictionary<City, IEnumerable<Flight>?> GetFlightsToCountry(City departureCity, string arrivalCountry, DateTime date)
         {
-            if (Country.IsExist(arrivalCountry)) throw new ArgumentException($"Country named \"{arrivalCountry}\" doesn`t exist");
+            if (!Country.IsExist(arrivalCountry)) throw new ArgumentException($"Country named \"{arrivalCountry}\" doesn`t exist");
 
             Dictionary<City, Flags> flags = Dijkstra(departureCity, date);
 
