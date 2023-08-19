@@ -15,7 +15,7 @@ namespace Airport
             {
                 try
                 {
-                    if (props[i].Name == "ID") continue;
+                    if (props[i].Name == "ID" || !props[i].CanWrite) continue;
                     Console.WriteLine("Input {0}:", props[i].Name);
                     string input = Console.ReadLine() ?? string.Empty;
                     if (input == "cancel") return null;

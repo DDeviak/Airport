@@ -38,18 +38,19 @@ namespace Pathfinding
                 List<GraphArcType> OutcomingArc = Graph.GetOutcomingArcs(currentNode).ToList();
                 OutcomingArc.ForEach((GraphArcType t) =>
                 {
-                    if (AdditionalCriteria(cf.PreviousArc, t))
-                        if (t.Length + cf.Distance < flags[t.To].Distance)
+                    if (!AdditionalCriteria(cf.PreviousArc, t)) return;
+                    if (t.Length + cf.Distance < flags[t.To].Distance)
+                    {
+                        Flags f = flags[t.To] with
                         {
-                            Flags f = flags[t.To];
-                            f.Distance = t.Length + cf.Distance;
-                            f.PreviousArc = t;
-                            flags[t.To] = f;
-                            pq.Enqueue(t.From, f.Distance);
-                        }
+                            Distance = t.Length + cf.Distance,
+                            PreviousArc = t
+                        };
+                        flags[t.To] = f;
+                        pq.Enqueue(t.To, f.Distance);
+                    }
                 });
-                cf.IsMarked = true;
-                flags[currentNode] = cf;
+                flags[currentNode] = cf with { IsMarked = true };
             }
 
             return flags;
