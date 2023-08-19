@@ -4,7 +4,7 @@ using Pathfinding;
 using System.ComponentModel;
 using System.Reflection;
 
-namespace Airport
+namespace WebAPI
 {
     [JsonObject(MemberSerialization.Fields)]
     public class Flight : IArc<City>

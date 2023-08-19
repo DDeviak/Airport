@@ -1,28 +1,28 @@
 ﻿using Newtonsoft.Json;
 using System.Reflection;
 
-namespace Airport
+namespace WebAPI
 {
     [JsonObject]
     public class Country
     {
-        static internal Dictionary<string, Country>? countries;
-        static public Dictionary<string, Country>? Countries
+        static internal Dictionary<string, Country> countries = null!;
+        static public Dictionary<string, Country> Countries
         {
             get
             {
                 if (countries == null) Initialize();
-                return countries;
+                return countries ?? new();
             }
         }
         static public void Initialize()
         {
-            using (Stream? stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Airport.CountriesConfig.json"))
+            using (Stream? stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("WebAPI.CountriesConfig.json"))
             using (StreamReader sr = new StreamReader(stream))
             {
                 JsonSerializer jsonSerializer = new JsonSerializer();
                 jsonSerializer.Formatting = Formatting.Indented;
-                countries = (Dictionary<string, Country>)jsonSerializer.Deserialize(sr, typeof(Dictionary<string, Country>));
+                countries = ((Dictionary<string, Country>?)jsonSerializer.Deserialize(sr, typeof(Dictionary<string, Country>)) ?? new Dictionary<string, Country>());
             }
         }
         static public IEnumerable<Country> GetAll()

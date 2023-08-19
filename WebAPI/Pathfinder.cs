@@ -1,6 +1,6 @@
 ﻿using Pathfinding;
 
-namespace Airport
+namespace WebAPI
 {
     public class Pathfinder : PathfinderBase<City, Flight>
     {

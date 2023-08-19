@@ -7,14 +7,30 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="CountriesConfig.json" />
+    <Content Remove="example.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="CountriesConfig.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="example.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.10" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Compilers" Version="4.7.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.5.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Airport\Airport.csproj" />
+    <ProjectReference Include="..\Pathfinding\Pathfinding.csproj" />
   </ItemGroup>
 
 </Project>

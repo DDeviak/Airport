@@ -1,11 +1,11 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace Airport
+namespace WebAPI
 {
     [JsonConverter(typeof(GraphCollectionConverter))]
     [JsonObject(MemberSerialization.Fields)]
-    public class GraphCollection : IGraphProvider<City, Flight>
+    public class GraphCollection : Pathfinding.IGraphProvider<City, Flight>
     {
         [JsonProperty()]
         Dictionary<City, Dictionary<int, Flight>> _flights = new Dictionary<City, Dictionary<int, Flight>>();

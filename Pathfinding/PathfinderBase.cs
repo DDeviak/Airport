@@ -1,6 +1,4 @@
-﻿using Airport;
-
-namespace Pathfinding
+﻿namespace Pathfinding
 {
     public abstract class PathfinderBase<GraphNodeType, GraphArcType>
         where GraphNodeType : IComparable

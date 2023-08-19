@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Airport
+namespace WebAPI
 {
     public class GraphCollectionConverter : JsonConverter
     {

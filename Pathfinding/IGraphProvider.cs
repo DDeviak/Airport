@@ -1,6 +1,4 @@
-﻿using Pathfinding;
-
-namespace Airport
+﻿namespace Pathfinding
 {
     public interface IGraphProvider<NodeType, ArcType>
         where NodeType : IComparable
