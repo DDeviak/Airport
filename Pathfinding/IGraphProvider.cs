@@ -1,11 +1,11 @@
 ﻿namespace Pathfinding
 {
-    public interface IGraphProvider<NodeType, ArcType>
-        where NodeType : IComparable
-        where ArcType : class, IArc<NodeType>
+    public interface IGraphProvider<TNode, TArc>
+        where TNode : IComparable
+        where TArc : class, IArc<TNode>
     {
-        public IEnumerable<NodeType> GetNodes();
+        public IEnumerable<TNode> GetNodes();
 
-        public IEnumerable<ArcType> GetOutcomingArcs(NodeType node);
+        public IEnumerable<TArc> GetOutcomingArcs(TNode node);
     }
 }

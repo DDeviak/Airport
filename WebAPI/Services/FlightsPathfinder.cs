@@ -4,11 +4,15 @@ namespace WebAPI
 {
     public class FlightsPathfinder : PathfinderBase<City, Flight>
     {
-        const int _maxTimeBetweenFlights = 7;
-        const int _minTimeBetweenFlights = 1;
+        protected const int _maxTimeBetweenFlights = 7;
+        protected const int _minTimeBetweenFlights = 1;
 
         public FlightsPathfinder(IGraphProvider<City, Flight> graph) : base(graph) { }
 
+        protected void ValidateArguments(City departureCity, City arrivalCity)
+        {
+            if (departureCity == arrivalCity) throw new ArgumentException("DepartureCity and ArrivalCity can`t be equal");
+        }
         protected Dictionary<City, Flags> Dijkstra(City from, DateTime date)
         {
             return Dijkstra(from, (current, t) =>
@@ -28,20 +32,20 @@ namespace WebAPI
         }
         public IEnumerable<Flight>? GetPath(City departureCity, City arrivalCity, DateTime date)
         {
-            if (departureCity == arrivalCity) throw new ArgumentException("DepartureCity and ArrivalCity can`t be equal");
+            ValidateArguments(departureCity, arrivalCity);
             return MakePath(Dijkstra(departureCity, date), departureCity, arrivalCity);
         }
 
         public IDictionary<DateTime, IEnumerable<Flight>?> GetFlightsByMonth(City departureCity, City arrivalCity, int year, int month)
         {
-            if (departureCity == arrivalCity) throw new ArgumentException("DepartureCity and ArrivalCity can`t be equal");
+            ValidateArguments(departureCity, arrivalCity);
 
             Dictionary<DateTime, IEnumerable<Flight>?> flightsByDays = new Dictionary<DateTime, IEnumerable<Flight>?>();
 
             for (int i = 1; i <= DateTime.DaysInMonth(year, month); i++)
             {
-                DateTime date = new DateTime(year, month, i);
-                flightsByDays[new DateTime(date.Year, date.Month, date.Day)] = GetPath(departureCity, arrivalCity, date);
+                DateTime date = new DateTime(year, month, i, 0, 0, 0, DateTimeKind.Utc);
+                flightsByDays[date] = GetPath(departureCity, arrivalCity, date);
             }
 
             return flightsByDays;
@@ -58,13 +62,9 @@ namespace WebAPI
             IEnumerable<Flight>? path;
             foreach (City arrivalCity in Country.GetCitiesByCountry(arrivalCountry))
             {
-                try
-                {
-                    path = MakePath(flags, departureCity, arrivalCity);
-                    if (path != null)
-                        flightsByCity.Add(arrivalCity, path);
-                }
-                catch { }
+                path = MakePath(flags, departureCity, arrivalCity);
+                if (path != null)
+                    flightsByCity.Add(arrivalCity, path);
             }
             return flightsByCity;
         }

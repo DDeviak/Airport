@@ -19,14 +19,14 @@ namespace WebAPI
         public DateTime DepartureDatetime
         {
             get { return departureDatetime; }
-            set { departureDatetime = value.Kind == DateTimeKind.Utc ? value : value.ToUniversalTime(); }
+            set { departureDatetime = value.ToUniversalTime(); }
         }
         [JsonIgnore]
         protected DateTime arrivalDatetime;
         public DateTime ArrivalDatetime
         {
             get { return arrivalDatetime; }
-            set { arrivalDatetime = value.Kind == DateTimeKind.Utc ? value : value.ToUniversalTime(); }
+            set { arrivalDatetime = value.ToUniversalTime(); }
         }
         [JsonConverter(typeof(StringEnumConverter))]
         public Airline Airline { get; set; }
@@ -41,28 +41,6 @@ namespace WebAPI
         [NotMapped]
         [JsonIgnore]
         public City To => ArrivalCity;
-
-        [JsonConstructor()]
-        public Flight(int id, City departureCity, City arrivalCity, DateTime departureDatetime, DateTime arrivalDatetime, Airline airline, double price)
-        {
-            this.ID = id;
-            this.DepartureCity = departureCity;
-            this.ArrivalCity = arrivalCity;
-            this.ArrivalDatetime = arrivalDatetime;
-            this.DepartureDatetime = departureDatetime;
-            this.Airline = airline;
-            this.Price = price;
-        }
-        public Flight()
-        {
-            this.ID = 0;
-            this.DepartureCity = City.Undefined;
-            this.ArrivalCity = City.Undefined;
-            this.DepartureDatetime = DateTime.MinValue;
-            this.ArrivalDatetime = DateTime.MaxValue;
-            this.Airline = Airline.Undefined;
-            this.Price = 0;
-        }
 
         public override string ToString()
         {

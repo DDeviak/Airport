@@ -1,42 +1,42 @@
 ﻿namespace Pathfinding
 {
-    public abstract class PathfinderBase<GraphNodeType, GraphArcType>
-        where GraphNodeType : IComparable
-        where GraphArcType : class, IArc<GraphNodeType>
+    public abstract class PathfinderBase<TGraphNode, TGraphArc>
+        where TGraphNode : IComparable
+        where TGraphArc : class, IArc<TGraphNode>
     {
-        protected record struct Flags(double Distance, GraphArcType? PreviousArc, bool IsMarked);
+        protected record struct Flags(double Distance, TGraphArc? PreviousArc, bool IsMarked);
 
-        public IGraphProvider<GraphNodeType, GraphArcType> Graph;
+        protected IGraphProvider<TGraphNode, TGraphArc> graph;
 
-        public PathfinderBase(IGraphProvider<GraphNodeType, GraphArcType> graph)
+        protected PathfinderBase(IGraphProvider<TGraphNode, TGraphArc> graph)
         {
-            Graph = graph;
+            this.graph = graph;
         }
 
-        protected Dictionary<GraphNodeType, Flags> Dijkstra(GraphNodeType from, Func<GraphArcType?, GraphArcType, bool> AdditionalCriteria)
+        protected Dictionary<TGraphNode, Flags> Dijkstra(TGraphNode from, Func<TGraphArc?, TGraphArc, bool> additionalCriteria)
         {
-            Dictionary<GraphNodeType, Flags> flags = new Dictionary<GraphNodeType, Flags>();
+            Dictionary<TGraphNode, Flags> flags = new Dictionary<TGraphNode, Flags>();
 
-            foreach (GraphNodeType t in Graph.GetNodes())
+            foreach (TGraphNode t in graph.GetNodes())
             {
                 flags[t] = new Flags(double.PositiveInfinity, null, false);
             }
             flags[from] = new Flags(0, null, false);
 
-            PriorityQueue<GraphNodeType, double> pq = new PriorityQueue<GraphNodeType, double>();
+            PriorityQueue<TGraphNode, double> pq = new PriorityQueue<TGraphNode, double>();
 
             pq.Enqueue(from, 0);
 
-            GraphNodeType currentNode;
+            TGraphNode currentNode;
             while (pq.Count > 0)
             {
                 currentNode = pq.Dequeue();
                 if (flags[currentNode].IsMarked) continue;
                 Flags cf = flags[currentNode];
-                List<GraphArcType> OutcomingArc = Graph.GetOutcomingArcs(currentNode).ToList();
-                OutcomingArc.ForEach((GraphArcType t) =>
+                List<TGraphArc> OutcomingArcs = graph.GetOutcomingArcs(currentNode).ToList();
+                OutcomingArcs.ForEach((TGraphArc t) =>
                 {
-                    if (!AdditionalCriteria(cf.PreviousArc, t)) return;
+                    if (!additionalCriteria(cf.PreviousArc, t)) return;
                     if (t.Length + cf.Distance < flags[t.To].Distance)
                     {
                         Flags f = flags[t.To] with
@@ -54,13 +54,13 @@
             return flags;
         }
 
-        protected IEnumerable<GraphArcType>? MakePath(Dictionary<GraphNodeType, Flags> flags, GraphNodeType from, GraphNodeType to)
+        protected IEnumerable<TGraphArc>? MakePath(Dictionary<TGraphNode, Flags> flags, TGraphNode from, TGraphNode to)
         {
-            List<GraphArcType> path = new List<GraphArcType>();
+            List<TGraphArc> path = new List<TGraphArc>();
 
             if (!flags.ContainsKey(to)) return null;
 
-            GraphNodeType currentGraphNode = to;
+            TGraphNode currentGraphNode = to;
             while (!currentGraphNode.Equals(from))
             {
                 Flags f = flags[currentGraphNode];

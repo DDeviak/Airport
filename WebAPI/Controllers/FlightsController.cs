@@ -15,7 +15,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Flight>))]
         public async Task<IActionResult> Get()
         {
-            return Ok(await Task.Run(() => Program.db.Flights.AsEnumerable()));
+            return Ok(await Task.Run(() => Program.Db.Flights.AsEnumerable()));
         }
 
         [HttpGet("{id}")]
@@ -24,7 +24,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get(int id)
         {
-            Flight? item = await Program.db.FindAsync<Flight>(id);
+            Flight? item = await Program.Db.FindAsync<Flight>(id);
             return item != null ? Ok(item) : NotFound();
         }
 
@@ -36,40 +36,48 @@ namespace WebAPI.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             if (value == null) return BadRequest(value);
-            if ((await Program.db.FindAsync<Flight>(value.ID)) != null) return BadRequest();
+            if ((await Program.Db.FindAsync<Flight>(value.ID)) != null) return BadRequest();
 
-            await Program.db.AddAsync(value);
-            await Program.db.SaveChangesAsync();
+            await Program.Db.AddAsync(value);
+            await Program.Db.SaveChangesAsync();
 
             return CreatedAtAction(nameof(Get), new { id = value.ID }, value);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut]
         [Consumes(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Put(int id, [FromBody] Flight value)
+        public async Task<IActionResult> Put([FromBody] Flight value)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             if (value == null) return BadRequest(value);
 
-            Flight? item = await Program.db.FindAsync<Flight>(id);
-            if (item != null) await Task.Run(() => Program.db.Remove(item));
+            Flight? item = await Program.Db.FindAsync<Flight>(value.ID);
+            if (item != null) await Task.Run(() => Program.Db.Remove(item));
 
-            await Program.db.AddAsync(value);
-            await Program.db.SaveChangesAsync();
+            await Program.Db.AddAsync(value);
+            await Program.Db.SaveChangesAsync();
 
-            return Ok();
+            if (item == null)
+            {
+                return CreatedAtAction(nameof(Get), new { id = value.ID }, value);
+            }
+            else
+            {
+                return NoContent();
+            }
         }
 
         [HttpPatch("{id}")]
         [Consumes(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Patch(int id, [FromBody] JsonPatchDocument<Flight> patch)
         {
-            Flight? item = await Program.db.FindAsync<Flight>(id);
+            Flight? item = await Program.Db.FindAsync<Flight>(id);
 
             if (item == null) return NotFound();
 
@@ -79,17 +87,21 @@ namespace WebAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            await Program.db.SaveChangesAsync();
+            await Program.Db.SaveChangesAsync();
 
-            return Ok();
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> Delete(int id)
         {
-            await Task.Run(() => Program.db.Remove(id));
-            await Program.db.SaveChangesAsync();
+            Flight? item = await Program.Db.FindAsync<Flight>(id);
+            if (item != null)
+            {
+                await Task.Run(() => Program.Db.Remove(item));
+                await Program.Db.SaveChangesAsync();
+            }
             return NoContent();
         }
     }

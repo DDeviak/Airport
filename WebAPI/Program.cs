@@ -1,21 +1,33 @@
-
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Converters;
 
 namespace WebAPI
 {
-    public class Program
+    public static class Program
     {
-        public static FlightsDbContext db = new FlightsDbContext();
-        public static FlightsPathfinder Pathfinder = new FlightsPathfinder(db);
+        public static FlightsDbContext Db { get; private set; } = null!;
+
+        public static FlightsPathfinder Pathfinder { get; private set; } = null!;
 
         public static void Main(string[] args)
         {
+            var configBuilder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json");
+            var config = configBuilder.Build();
+            string connectionString = config.GetConnectionString("DefaultConnection");
+
+            var optionsBuilder = new DbContextOptionsBuilder<FlightsDbContext>();
+            var options = optionsBuilder.UseNpgsql(connectionString).Options;
+
             var builder = WebApplication.CreateBuilder(args);
+
+            Db = new FlightsDbContext(options);
+            Pathfinder = new FlightsPathfinder(new DbGraphProvider(Db));
 
             builder.Services.AddControllers().AddNewtonsoftJson(opts =>
             {
                 opts.SerializerSettings.Converters.Add(new StringEnumConverter());
-                opts.SerializerSettings.Converters.Add(new GraphCollectionConverter());
                 opts.SerializerSettings.DateFormatString = "dd/MM/yyyy HH:mm:ss";
                 opts.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented;
             });
