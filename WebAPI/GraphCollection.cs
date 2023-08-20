@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using System.ComponentModel;
+using System.Reflection;
 
 namespace WebAPI
 {
@@ -52,7 +54,19 @@ namespace WebAPI
             {
                 if (t.ContainsKey(id))
                 {
-                    t[id].SetProperty(propertyName, propertyValue);
+                    try
+                    {
+                        PropertyInfo? property = typeof(Flight).GetProperty(propertyName);
+                        property?.SetValue(t[id], TypeDescriptor.GetConverter(property.PropertyType).ConvertFrom(propertyValue), null);
+                    }
+                    catch (TargetInvocationException ex)
+                    {
+                        throw ex.InnerException ?? ex;
+                    }
+                    catch (NullReferenceException)
+                    {
+                        throw new KeyNotFoundException("Property with such name doesn`t exist");
+                    }
                     if (propertyName == "DepartureCity")
                     {
                         Add(t[id]);

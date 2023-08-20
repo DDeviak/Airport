@@ -1,84 +1,46 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Pathfinding;
-using System.ComponentModel;
-using System.Reflection;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebAPI
 {
-    [JsonObject(MemberSerialization.Fields)]
-    public class Flight : IArc<City>
+    [JsonObject]
+    public class Flight : IArc<City>, IValidatableObject
     {
-        readonly public int ID;
+        public int ID { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
-        protected City departureCity;
-        public City DepartureCity
-        {
-            get { return departureCity; }
-            set
-            {
-                if (!Enum.IsDefined(typeof(City), value)) throw new ArgumentException("DepartureCity can`t be equal " + value);
-                if (value == arrivalCity) throw new ArgumentException("DepartureCity and ArrivalCity can`t be equal");
-                departureCity = value;
-            }
-        }
+        public City DepartureCity { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
-        protected City arrivalCity;
-        public City ArrivalCity
-        {
-            get { return arrivalCity; }
-            set
-            {
-                if (!Enum.IsDefined(typeof(City), value)) throw new ArgumentException("ArrivalCity can`t be equal " + value);
-                if (departureCity == value) throw new ArgumentException("DepartureCity and ArrivalCity can`t be equal");
-                arrivalCity = value;
-            }
-        }
+        public City ArrivalCity { get; set; }
+        [JsonIgnore]
         protected DateTime departureDatetime;
         public DateTime DepartureDatetime
         {
             get { return departureDatetime; }
-            set
-            {
-                if (arrivalDatetime < value) throw new ArgumentException("DepartureDatetime can`t be later than ArrivalDatetime");
-                departureDatetime = value;
-            }
+            set { departureDatetime = value.Kind == DateTimeKind.Utc ? value : value.ToUniversalTime(); }
         }
+        [JsonIgnore]
         protected DateTime arrivalDatetime;
         public DateTime ArrivalDatetime
         {
             get { return arrivalDatetime; }
-            set
-            {
-                if (value < departureDatetime) throw new ArgumentException("ArrivalDatetime can`t be sooner than DepartureDatetime");
-                arrivalDatetime = value;
-            }
+            set { arrivalDatetime = value.Kind == DateTimeKind.Utc ? value : value.ToUniversalTime(); }
         }
         [JsonConverter(typeof(StringEnumConverter))]
-        protected Airline airline;
-        public Airline Airline
-        {
-            get { return airline; }
-            set
-            {
-                if (!Enum.IsDefined(typeof(Airline), value)) throw new ArgumentException("Airline can`t be equal " + value);
-                airline = value;
-            }
-        }
-        protected double price;
-        public double Price
-        {
-            get { return price; }
-            set
-            {
-                if (value < 0) throw new ArgumentException("Price can`t be less than zero");
-                price = double.Round(value, 2);
-            }
-        }
+        public Airline Airline { get; set; }
+        public double Price { get; set; }
 
-        public double Length => price;
-        public City From => departureCity;
-        public City To => arrivalCity;
+        [NotMapped]
+        [JsonIgnore]
+        public double Length => Price;
+        [NotMapped]
+        [JsonIgnore]
+        public City From => DepartureCity;
+        [NotMapped]
+        [JsonIgnore]
+        public City To => ArrivalCity;
 
         [JsonConstructor()]
         public Flight(int id, City departureCity, City arrivalCity, DateTime departureDatetime, DateTime arrivalDatetime, Airline airline, double price)
@@ -91,47 +53,32 @@ namespace WebAPI
             this.Airline = airline;
             this.Price = price;
         }
-        public Flight(int id)
+        public Flight()
         {
-            this.ID = id;
-            this.departureCity = City.Undefined;
-            this.arrivalCity = City.Undefined;
-            this.departureDatetime = DateTime.MinValue;
-            this.arrivalDatetime = DateTime.MaxValue;
-            this.airline = Airline.Undefined;
-            this.price = 0;
-        }
-        public void SetProperty(string propertyName, object value)
-        {
-            try
-            {
-                PropertyInfo? property = GetType().GetProperty(propertyName);
-                property?.SetValue(this, TypeDescriptor.GetConverter(property.PropertyType).ConvertFrom(value), null);
-            }
-            catch (TargetInvocationException ex)
-            {
-                throw ex.InnerException ?? ex;
-            }
-            catch (NullReferenceException)
-            {
-                throw new KeyNotFoundException("Property with such name doesn`t exist");
-            }
-        }
-        public void SetProperty(PropertyInfo property, object value)
-        {
-            try
-            {
-                property.SetValue(this, TypeDescriptor.GetConverter(property.PropertyType).ConvertFrom(value), null);
-            }
-            catch (TargetInvocationException ex)
-            {
-                throw ex.InnerException ?? ex;
-            }
+            this.ID = 0;
+            this.DepartureCity = City.Undefined;
+            this.ArrivalCity = City.Undefined;
+            this.DepartureDatetime = DateTime.MinValue;
+            this.ArrivalDatetime = DateTime.MaxValue;
+            this.Airline = Airline.Undefined;
+            this.Price = 0;
         }
 
         public override string ToString()
         {
-            return string.Format("{0}, {1} - {2}, {3} - {4}, {5}, ${6}", ID, DepartureCity, ArrivalCity, DepartureDatetime, ArrivalDatetime, Airline, Price);
+            return string.Format($"{ID}, {DepartureCity} - {ArrivalCity}, {DepartureDatetime} - {ArrivalDatetime}, {Airline}, ${Price}");
+        }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            List<ValidationResult> errors = new List<ValidationResult>();
+
+            if (DepartureCity == ArrivalCity) errors.Add(new ValidationResult("DepartureCity and ArrivalCity can`t be equal"));
+            if (ArrivalDatetime < DepartureDatetime) errors.Add(new ValidationResult("DepartureDatetime can`t be later than ArrivalDatetime"));
+            if (ArrivalDatetime == DepartureDatetime) errors.Add(new ValidationResult("DepartureDatetime and ArrivalDatetime can`t be equal"));
+            if (Price < 0) errors.Add(new ValidationResult("Price can`t be less than zero"));
+
+            return errors;
         }
     }
 }

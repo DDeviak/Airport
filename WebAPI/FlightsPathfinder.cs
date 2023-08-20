@@ -2,12 +2,12 @@
 
 namespace WebAPI
 {
-    public class Pathfinder : PathfinderBase<City, Flight>
+    public class FlightsPathfinder : PathfinderBase<City, Flight>
     {
         const int _maxTimeBetweenFlights = 7;
         const int _minTimeBetweenFlights = 1;
 
-        public Pathfinder(GraphCollection graph) : base(graph) { }
+        public FlightsPathfinder(IGraphProvider<City, Flight> graph) : base(graph) { }
 
         protected Dictionary<City, Flags> Dijkstra(City from, DateTime date)
         {
@@ -41,7 +41,7 @@ namespace WebAPI
             for (int i = 1; i <= DateTime.DaysInMonth(year, month); i++)
             {
                 DateTime date = new DateTime(year, month, i);
-                flightsByDays[date] = GetPath(departureCity, arrivalCity, date);
+                flightsByDays[new DateTime(date.Year, date.Month, date.Day)] = GetPath(departureCity, arrivalCity, date);
             }
 
             return flightsByDays;

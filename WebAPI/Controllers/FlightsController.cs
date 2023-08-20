@@ -15,7 +15,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Flight>))]
         public async Task<IActionResult> Get()
         {
-            return Ok(await Task.Run(() => ((GraphCollection)Program.Pathfinder.Graph).AsEnumerable()));
+            return Ok(await Task.Run(() => Program.db.Flights.AsEnumerable()));
         }
 
         [HttpGet("{id}")]
@@ -24,14 +24,8 @@ namespace WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get(int id)
         {
-            try
-            {
-                return Ok(await Task.Run(() => ((GraphCollection)Program.Pathfinder.Graph).Get(id)));
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
+            Flight? item = await Program.db.FindAsync<Flight>(id);
+            return item != null ? Ok(item) : NotFound();
         }
 
         [HttpPost]
@@ -40,37 +34,32 @@ namespace WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Post([FromBody] Flight value)
         {
-            try
-            {
-                await Task.Run(() => ((GraphCollection)Program.Pathfinder.Graph).Add(value));
-                return CreatedAtAction(nameof(Get), new { id = value.ID }, value);
-            }
-            catch (ArgumentException)
-            {
-                return BadRequest();
-            }
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (value == null) return BadRequest(value);
+            if ((await Program.db.FindAsync<Flight>(value.ID)) != null) return BadRequest();
+
+            await Program.db.AddAsync(value);
+            await Program.db.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(Get), new { id = value.ID }, value);
         }
 
         [HttpPut("{id}")]
         [Consumes(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Put(int id, [FromBody] Flight value)
         {
-            try
-            {
-                await Task.Run(() => ((GraphCollection)Program.Pathfinder.Graph).Replace(id, value));
-                return Ok();
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-            catch (ArgumentException)
-            {
-                return BadRequest();
-            }
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (value == null) return BadRequest(value);
+
+            Flight? item = await Program.db.FindAsync<Flight>(id);
+            if (item != null) await Task.Run(() => Program.db.Remove(item));
+
+            await Program.db.AddAsync(value);
+            await Program.db.SaveChangesAsync();
+
+            return Ok();
         }
 
         [HttpPatch("{id}")]
@@ -80,35 +69,28 @@ namespace WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Patch(int id, [FromBody] JsonPatchDocument<Flight> patch)
         {
-            try
+            Flight? item = await Program.db.FindAsync<Flight>(id);
+
+            if (item == null) return NotFound();
+
+            patch.ApplyTo(item, ModelState);
+            if (!ModelState.IsValid)
             {
-                patch.ApplyTo(await Task.Run(() => ((GraphCollection)Program.Pathfinder.Graph).Get(id)), ModelState);
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-                return Ok();
+                return BadRequest(ModelState);
             }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
+
+            await Program.db.SaveChangesAsync();
+
+            return Ok();
         }
 
         [HttpDelete("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> Delete(int id)
         {
-            try
-            {
-                await Task.Run(() => ((GraphCollection)Program.Pathfinder.Graph).Remove(id));
-                return Ok();
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
+            await Task.Run(() => Program.db.Remove(id));
+            await Program.db.SaveChangesAsync();
+            return NoContent();
         }
     }
 }

@@ -58,6 +58,8 @@
         {
             List<GraphArcType> path = new List<GraphArcType>();
 
+            if (!flags.ContainsKey(to)) return null;
+
             GraphNodeType currentGraphNode = to;
             while (!currentGraphNode.Equals(from))
             {

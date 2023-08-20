@@ -5,7 +5,8 @@ namespace WebAPI
 {
     public class Program
     {
-        public static Pathfinder Pathfinder = new Pathfinder(new GraphCollection());
+        public static FlightsDbContext db = new FlightsDbContext();
+        public static FlightsPathfinder Pathfinder = new FlightsPathfinder(db);
 
         public static void Main(string[] args)
         {
