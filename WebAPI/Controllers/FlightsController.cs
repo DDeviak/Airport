@@ -4,9 +4,9 @@
 
 namespace WebAPI.Controllers
 {
+	using System.Net.Mime;
 	using Microsoft.AspNetCore.JsonPatch;
 	using Microsoft.AspNetCore.Mvc;
-	using System.Net.Mime;
 
 	[Route("api/[controller]")]
 	[ApiController]
