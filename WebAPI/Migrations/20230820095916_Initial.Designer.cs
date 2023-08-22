@@ -11,54 +11,53 @@ using WebAPI;
 
 namespace WebAPI.Migrations
 {
-    [DbContext(typeof(FlightsDbContext))]
-    [Migration("20230820095916_Initial")]
-    partial class Initial
-    {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
-        {
+	[DbContext(typeof(FlightsDbContext))]
+	[Migration("20230820095916_Initial")]
+	partial class Initial
+	{
+		protected override void BuildTargetModel(ModelBuilder modelBuilder)
+		{
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.10")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+			modelBuilder
+				.HasAnnotation("ProductVersion", "7.0.10")
+				.HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+			NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("WebAPI.Flight", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+			modelBuilder.Entity("WebAPI.Flight", b =>
+				{
+					b.Property<int>("ID")
+						.ValueGeneratedOnAdd()
+						.HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
+					NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
 
-                    b.Property<string>("Airline")
-                        .IsRequired()
-                        .HasColumnType("text");
+					b.Property<string>("Airline")
+						.IsRequired()
+						.HasColumnType("text");
 
-                    b.Property<string>("ArrivalCity")
-                        .IsRequired()
-                        .HasColumnType("text");
+					b.Property<string>("ArrivalCity")
+						.IsRequired()
+						.HasColumnType("text");
 
-                    b.Property<DateTime>("ArrivalDatetime")
-                        .HasColumnType("timestamp with time zone");
+					b.Property<DateTime>("ArrivalDatetime")
+						.HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("DepartureCity")
-                        .IsRequired()
-                        .HasColumnType("text");
+					b.Property<string>("DepartureCity")
+						.IsRequired()
+						.HasColumnType("text");
 
-                    b.Property<DateTime>("DepartureDatetime")
-                        .HasColumnType("timestamp with time zone");
+					b.Property<DateTime>("DepartureDatetime")
+						.HasColumnType("timestamp with time zone");
 
-                    b.Property<double>("Price")
-                        .HasColumnType("double precision");
+					b.Property<double>("Price")
+						.HasColumnType("double precision");
 
-                    b.HasKey("ID");
+					b.HasKey("ID");
 
-                    b.ToTable("Flights");
-                });
+					b.ToTable("Flights");
+				});
 #pragma warning restore 612, 618
-        }
-    }
+		}
+	}
 }

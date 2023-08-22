@@ -1,50 +1,54 @@
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Converters;
+// <copyright file="Program.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace WebAPI
 {
-    public static class Program
-    {
-        public static FlightsDbContext Db { get; private set; } = null!;
+	using Microsoft.EntityFrameworkCore;
+	using Newtonsoft.Json.Converters;
 
-        public static FlightsPathfinder Pathfinder { get; private set; } = null!;
+	public static class Program
+	{
+		public static FlightsDbContext Db { get; private set; } = null!;
 
-        public static void Main(string[] args)
-        {
-            var configBuilder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json");
-            var config = configBuilder.Build();
-            string connectionString = config.GetConnectionString("DefaultConnection");
+		public static FlightsPathfinder Pathfinder { get; private set; } = null!;
 
-            var optionsBuilder = new DbContextOptionsBuilder<FlightsDbContext>();
-            var options = optionsBuilder.UseNpgsql(connectionString).Options;
+		public static void Main(string[] args)
+		{
+			var configBuilder = new ConfigurationBuilder()
+				.SetBasePath(Directory.GetCurrentDirectory())
+				.AddJsonFile("appsettings.json");
+			var config = configBuilder.Build();
+			string connectionString = config.GetConnectionString("DefaultConnection") ?? string.Empty;
 
-            var builder = WebApplication.CreateBuilder(args);
+			var optionsBuilder = new DbContextOptionsBuilder<FlightsDbContext>();
+			var options = optionsBuilder.UseNpgsql(connectionString).Options;
 
-            Db = new FlightsDbContext(options);
-            Pathfinder = new FlightsPathfinder(new DbGraphProvider(Db));
+			var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddControllers().AddNewtonsoftJson(opts =>
-            {
-                opts.SerializerSettings.Converters.Add(new StringEnumConverter());
-                opts.SerializerSettings.DateFormatString = "dd/MM/yyyy HH:mm:ss";
-                opts.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented;
-            });
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen().AddSwaggerGenNewtonsoftSupport();
+			Db = new FlightsDbContext(options);
+			Pathfinder = new FlightsPathfinder(new DbGraphProvider(Db));
 
-            var app = builder.Build();
+			builder.Services.AddControllers().AddNewtonsoftJson(opts =>
+			{
+				opts.SerializerSettings.Converters.Add(new StringEnumConverter());
+				opts.SerializerSettings.DateFormatString = "dd/MM/yyyy HH:mm:ss";
+				opts.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented;
+			});
+			builder.Services.AddEndpointsApiExplorer();
+			builder.Services.AddSwaggerGen().AddSwaggerGenNewtonsoftSupport();
 
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+			var app = builder.Build();
 
-            app.MapControllers();
+			if (app.Environment.IsDevelopment())
+			{
+				app.UseSwagger();
+				app.UseSwaggerUI();
+			}
 
-            app.Run();
-        }
-    }
+			app.MapControllers();
+
+			app.Run();
+		}
+	}
 }

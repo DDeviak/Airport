@@ -1,21 +1,27 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿// <copyright file="FlightsDbContext.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace WebAPI
 {
-    public class FlightsDbContext : DbContext
-    {
-        public DbSet<Flight> Flights { get; set; } = null!;
+	using Microsoft.EntityFrameworkCore;
 
-        public FlightsDbContext(DbContextOptions<FlightsDbContext> options)
-            : base(options) { }
+	public class FlightsDbContext : DbContext
+	{
+		public FlightsDbContext(DbContextOptions<FlightsDbContext> options)
+			: base(options)
+		{
+		}
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Flight>().Property(e => e.DepartureCity).HasConversion<string>();
-            modelBuilder.Entity<Flight>().Property(e => e.ArrivalCity).HasConversion<string>();
-            modelBuilder.Entity<Flight>().Property(e => e.Airline).HasConversion<string>();
+		public DbSet<Flight> Flights { get; set; } = null!;
 
-            base.OnModelCreating(modelBuilder);
-        }
-    }
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
+		{
+			modelBuilder.Entity<Flight>().Property(e => e.DepartureCity).HasConversion<string>();
+			modelBuilder.Entity<Flight>().Property(e => e.ArrivalCity).HasConversion<string>();
+			modelBuilder.Entity<Flight>().Property(e => e.Airline).HasConversion<string>();
+
+			base.OnModelCreating(modelBuilder);
+		}
+	}
 }

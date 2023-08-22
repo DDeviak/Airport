@@ -1,76 +1,118 @@
-﻿namespace Pathfinding
+﻿// <copyright file="PathfinderBase.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
+namespace Pathfinding
 {
-    public abstract class PathfinderBase<TGraphNode, TGraphArc>
-        where TGraphNode : IComparable
-        where TGraphArc : class, IArc<TGraphNode>
-    {
-        protected record struct Flags(double Distance, TGraphArc? PreviousArc, bool IsMarked);
+	/// <summary>
+	/// Base abstract class for pathfinding on graph implementation.
+	/// </summary>
+	/// <typeparam name="TGraphNode">Type of Nodes used in graph.</typeparam>
+	/// <typeparam name="TGraphArc">Type of arcs used in graph.</typeparam>
+	public abstract class PathfinderBase<TGraphNode, TGraphArc>
+		where TGraphNode : IComparable
+		where TGraphArc : class, IArc<TGraphNode>
+	{
+		protected record struct Flags(double totalDistance, TGraphArc? previousArc, bool isMarked);
 
-        protected IGraphProvider<TGraphNode, TGraphArc> graph;
+		private readonly IGraphProvider<TGraphNode, TGraphArc> graph;
 
-        protected PathfinderBase(IGraphProvider<TGraphNode, TGraphArc> graph)
-        {
-            this.graph = graph;
-        }
+		/// <summary>
+		/// Initializes a new instance of the <see cref="PathfinderBase{TGraphNode, TGraphArc}"/> class.
+		/// </summary>
+		/// <param name="graph">Graph to do pathfinding on.</param>
+		protected PathfinderBase(IGraphProvider<TGraphNode, TGraphArc> graph)
+		{
+			this.graph = graph;
+		}
 
-        protected Dictionary<TGraphNode, Flags> Dijkstra(TGraphNode from, Func<TGraphArc?, TGraphArc, bool> additionalCriteria)
-        {
-            Dictionary<TGraphNode, Flags> flags = new Dictionary<TGraphNode, Flags>();
+		/// <summary>
+		/// Implements Dijkstra pathfinding algorythm.
+		/// </summary>
+		/// <param name="from"> Pathes starting node. </param>
+		/// <param name="additionalCriteria"> Additional criteria for arcs selection. </param>
+		/// <returns><see cref="Dictionary{TGraphNode, Flags}"/> of flags associated with nodes of graph.</returns>
+		protected Dictionary<TGraphNode, Flags> Dijkstra(TGraphNode from, Func<TGraphArc?, TGraphArc, bool> additionalCriteria)
+		{
+			Dictionary<TGraphNode, Flags> flags = new Dictionary<TGraphNode, Flags>();
 
-            foreach (TGraphNode t in graph.GetNodes())
-            {
-                flags[t] = new Flags(double.PositiveInfinity, null, false);
-            }
-            flags[from] = new Flags(0, null, false);
+			foreach (TGraphNode t in graph.GetNodes())
+			{
+				flags[t] = new Flags(double.PositiveInfinity, null, false);
+			}
 
-            PriorityQueue<TGraphNode, double> pq = new PriorityQueue<TGraphNode, double>();
+			flags[from] = new Flags(0, null, false);
 
-            pq.Enqueue(from, 0);
+			PriorityQueue<TGraphNode, double> pq = new PriorityQueue<TGraphNode, double>();
 
-            TGraphNode currentNode;
-            while (pq.Count > 0)
-            {
-                currentNode = pq.Dequeue();
-                if (flags[currentNode].IsMarked) continue;
-                Flags cf = flags[currentNode];
-                List<TGraphArc> OutcomingArcs = graph.GetOutcomingArcs(currentNode).ToList();
-                OutcomingArcs.ForEach((TGraphArc t) =>
-                {
-                    if (!additionalCriteria(cf.PreviousArc, t)) return;
-                    if (t.Length + cf.Distance < flags[t.To].Distance)
-                    {
-                        Flags f = flags[t.To] with
-                        {
-                            Distance = t.Length + cf.Distance,
-                            PreviousArc = t
-                        };
-                        flags[t.To] = f;
-                        pq.Enqueue(t.To, f.Distance);
-                    }
-                });
-                flags[currentNode] = cf with { IsMarked = true };
-            }
+			pq.Enqueue(from, 0);
 
-            return flags;
-        }
+			TGraphNode currentNode;
+			while (pq.Count > 0)
+			{
+				currentNode = pq.Dequeue();
+				if (flags[currentNode].isMarked)
+				{
+					continue;
+				}
 
-        protected IEnumerable<TGraphArc>? MakePath(Dictionary<TGraphNode, Flags> flags, TGraphNode from, TGraphNode to)
-        {
-            List<TGraphArc> path = new List<TGraphArc>();
+				Flags cf = flags[currentNode];
+				List<TGraphArc> outcomingArcs = graph.GetOutcomingArcs(currentNode).ToList();
+				outcomingArcs.ForEach((TGraphArc t) =>
+				{
+					if (!additionalCriteria(cf.previousArc, t))
+					{
+						return;
+					}
 
-            if (!flags.ContainsKey(to)) return null;
+					if (t.Length + cf.totalDistance < flags[t.To].totalDistance)
+					{
+						PathfinderBase<TGraphNode, TGraphArc>.Flags f = flags[t.To] with
+						{
+							totalDistance = t.Length + cf.totalDistance,
+							previousArc = t
+						};
+						flags[t.To] = f;
+						pq.Enqueue(t.To, f.totalDistance);
+					}
+				});
+				flags[currentNode] = cf with { isMarked = true };
+			}
 
-            TGraphNode currentGraphNode = to;
-            while (!currentGraphNode.Equals(from))
-            {
-                Flags f = flags[currentGraphNode];
-                if (f.PreviousArc == null) return null;
-                path.Add(f.PreviousArc);
-                currentGraphNode = f.PreviousArc.From;
-            }
+			return flags;
+		}
 
-            path.Reverse();
-            return path;
-        }
-    }
+		/// <summary>
+		/// Generates path using provided flags.
+		/// </summary>
+		/// <param name="flags">Flags generated by Dijkstra algorythm.</param>
+		/// <param name="from">Path starting node. Must be the same as passed to <see cref="Dijkstra(TGraphNode, Func{TGraphArc?, TGraphArc, bool})"/>.</param>
+		/// <param name="to">Path ending point.</param>
+		/// <returns><see cref="IEnumerable{TGraphArc}?"/> representing the requested path.</returns>
+		protected IEnumerable<TGraphArc>? MakePath(Dictionary<TGraphNode, Flags> flags, TGraphNode from, TGraphNode to)
+		{
+			List<TGraphArc> path = new List<TGraphArc>();
+
+			if (!flags.ContainsKey(to))
+			{
+				return null;
+			}
+
+			TGraphNode currentGraphNode = to;
+			while (!currentGraphNode.Equals(from))
+			{
+				Flags f = flags[currentGraphNode];
+				if (f.previousArc == null)
+				{
+					return null;
+				}
+
+				path.Add(f.previousArc);
+				currentGraphNode = f.previousArc.From;
+			}
+
+			path.Reverse();
+			return path;
+		}
+	}
 }
