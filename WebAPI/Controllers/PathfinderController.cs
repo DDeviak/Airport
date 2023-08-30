@@ -11,6 +11,13 @@ namespace WebAPI.Controllers
 	[ApiController]
 	public class PathfinderController : ControllerBase
 	{
+		private readonly FlightsPathfinder pathfinder;
+
+		public PathfinderController(FlightsDbContext context)
+		{
+			this.pathfinder = new FlightsPathfinder(new DbGraphProvider(context));
+		}
+
 		[HttpGet]
 		[Produces(MediaTypeNames.Application.Json)]
 		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Flight>))]
@@ -20,7 +27,7 @@ namespace WebAPI.Controllers
 		{
 			try
 			{
-				IEnumerable<Flight>? path = await Task.Run(() => Program.Pathfinder.GetPath(departureCity, arrivalCity, departureDate.ToDateTime(default(TimeOnly))));
+				IEnumerable<Flight>? path = await Task.Run(() => pathfinder.GetPath(departureCity, arrivalCity, departureDate.ToDateTime(default(TimeOnly))));
 				if (path != null)
 				{
 					return Ok(path);
@@ -38,14 +45,14 @@ namespace WebAPI.Controllers
 
 		[HttpGet("byCountry")]
 		[Produces(MediaTypeNames.Application.Json)]
-		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IDictionary<City, IEnumerable<Flight>?>))]
+		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IDictionary<City, IEnumerable<Flight>>))]
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
 		public async Task<IActionResult> Get([FromQuery] City departureCity, [FromQuery] string arrivalCountry, [FromQuery] DateOnly departureDate)
 		{
 			try
 			{
-				IDictionary<City, IEnumerable<Flight>?> pathes = await Task.Run(() => Program.Pathfinder.GetFlightsToCountry(departureCity, arrivalCountry, departureDate.ToDateTime(default(TimeOnly))));
+				IDictionary<City, IEnumerable<Flight>> pathes = await Task.Run(() => pathfinder.GetFlightsToCountry(departureCity, arrivalCountry, departureDate.ToDateTime(default(TimeOnly))));
 				if (pathes.Count != 0)
 				{
 					return Ok(pathes);
@@ -70,7 +77,7 @@ namespace WebAPI.Controllers
 		{
 			try
 			{
-				IDictionary<DateTime, IEnumerable<Flight>?> pathes = await Task.Run(() => Program.Pathfinder.GetFlightsByMonth(departureCity, arrivalCity, year, month));
+				IDictionary<DateTime, IEnumerable<Flight>?> pathes = await Task.Run(() => pathfinder.GetFlightsByMonth(departureCity, arrivalCity, year, month));
 				if (pathes.Any(t => t.Value != null))
 				{
 					return Ok(pathes);

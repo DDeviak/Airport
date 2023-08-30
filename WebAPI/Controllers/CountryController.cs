@@ -14,7 +14,7 @@ namespace WebAPI.Controllers
 		[HttpGet]
 		[Produces(MediaTypeNames.Application.Json)]
 		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Country>))]
-		public async Task<IActionResult> Get()
+		public async Task<IActionResult> GetAll()
 		{
 			return Ok(await Task.Run(() => Country.GetAll()));
 		}

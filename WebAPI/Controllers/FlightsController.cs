@@ -12,12 +12,19 @@ namespace WebAPI.Controllers
 	[ApiController]
 	public class FlightsController : ControllerBase
 	{
+		private readonly FlightsDbContext context;
+
+		public FlightsController(FlightsDbContext context)
+		{
+			this.context = context;
+		}
+
 		[HttpGet]
 		[Produces(MediaTypeNames.Application.Json)]
 		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Flight>))]
-		public async Task<IActionResult> Get()
+		public async Task<IActionResult> GetAll()
 		{
-			return Ok(await Task.Run(() => Program.Db.Flights.AsEnumerable()));
+			return Ok(await Task.Run(() => context.Flights.AsEnumerable()));
 		}
 
 		[HttpGet("{id}")]
@@ -26,7 +33,7 @@ namespace WebAPI.Controllers
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
 		public async Task<IActionResult> Get(int id)
 		{
-			Flight? item = await Program.Db.FindAsync<Flight>(id);
+			Flight? item = await context.FindAsync<Flight>(id);
 			return item != null ? Ok(item) : NotFound();
 		}
 
@@ -46,13 +53,13 @@ namespace WebAPI.Controllers
 				return BadRequest(value);
 			}
 
-			if ((await Program.Db.FindAsync<Flight>(value.ID)) != null)
+			if ((await context.FindAsync<Flight>(value.ID)) != null)
 			{
 				return BadRequest();
 			}
 
-			await Program.Db.AddAsync(value);
-			await Program.Db.SaveChangesAsync();
+			await context.AddAsync(value);
+			await context.SaveChangesAsync();
 
 			return CreatedAtAction(nameof(Get), new { id = value.ID }, value);
 		}
@@ -74,14 +81,14 @@ namespace WebAPI.Controllers
 				return BadRequest(value);
 			}
 
-			Flight? item = await Program.Db.FindAsync<Flight>(value.ID);
+			Flight? item = await context.FindAsync<Flight>(value.ID);
 			if (item != null)
 			{
-				await Task.Run(() => Program.Db.Remove(item));
+				await Task.Run(() => context.Remove(item));
 			}
 
-			await Program.Db.AddAsync(value);
-			await Program.Db.SaveChangesAsync();
+			await context.AddAsync(value);
+			await context.SaveChangesAsync();
 
 			if (item == null)
 			{
@@ -100,7 +107,7 @@ namespace WebAPI.Controllers
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
 		public async Task<IActionResult> Patch(int id, [FromBody] JsonPatchDocument<Flight> patch)
 		{
-			Flight? item = await Program.Db.FindAsync<Flight>(id);
+			Flight? item = await context.FindAsync<Flight>(id);
 
 			if (item == null)
 			{
@@ -108,12 +115,13 @@ namespace WebAPI.Controllers
 			}
 
 			patch.ApplyTo(item, ModelState);
+			TryValidateModel(item);
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ModelState);
 			}
 
-			await Program.Db.SaveChangesAsync();
+			await context.SaveChangesAsync();
 
 			return NoContent();
 		}
@@ -122,11 +130,11 @@ namespace WebAPI.Controllers
 		[ProducesResponseType(StatusCodes.Status204NoContent)]
 		public async Task<IActionResult> Delete(int id)
 		{
-			Flight? item = await Program.Db.FindAsync<Flight>(id);
-			if (item != null)
+			Flight? item = await context.Flights.FindAsync(id);
+			if (item is not null)
 			{
-				await Task.Run(() => Program.Db.Remove(item));
-				await Program.Db.SaveChangesAsync();
+				await Task.Run(() => context.Flights.Remove(item));
+				await context.SaveChangesAsync();
 			}
 
 			return NoContent();

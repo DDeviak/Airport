@@ -37,7 +37,7 @@ namespace WebAPI
 			return flightsByDays;
 		}
 
-		public IDictionary<City, IEnumerable<Flight>?> GetFlightsToCountry(City departureCity, string arrivalCountry, DateTime date)
+		public IDictionary<City, IEnumerable<Flight>> GetFlightsToCountry(City departureCity, string arrivalCountry, DateTime date)
 		{
 			if (!Country.IsExist(arrivalCountry))
 			{
@@ -46,13 +46,13 @@ namespace WebAPI
 
 			Dictionary<City, Flags> flags = Dijkstra(departureCity, date);
 
-			Dictionary<City, IEnumerable<Flight>?> flightsByCity = new Dictionary<City, IEnumerable<Flight>?>();
+			Dictionary<City, IEnumerable<Flight>> flightsByCity = new Dictionary<City, IEnumerable<Flight>>();
 
 			IEnumerable<Flight>? path;
 			foreach (City arrivalCity in Country.GetCitiesByCountry(arrivalCountry))
 			{
 				path = MakePath(flags, departureCity, arrivalCity);
-				if (path != null)
+				if (path != null && path.Count() != 0)
 				{
 					flightsByCity.Add(arrivalCity, path);
 				}
