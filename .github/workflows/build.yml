@@ -46,7 +46,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          dotnet sonarscanner begin /k:"DDeviak_Airport" /o:"ddeviak" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportPaths="./coverage/coverage.xml"
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"DDeviak_Airport" /o:"ddeviak" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportPaths="./coverage/coverage.xml"
             dotnet build --no-incremental
-            coverlet .\Tests\bin\Debug\net7.0\WebAPI.Tests.dll --target "dotnet" --targetargs "test --no-build" -f=opencover -o="coverage.xml"
-          dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+            coverlet .\Tests\bin\Debug\net7.0\WebAPI.Tests.dll --target "dotnet" --targetargs "test --no-build" -f=opencover -o="coverage.xml" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=./coverage/coverage.xml
+          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
