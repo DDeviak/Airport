@@ -40,13 +40,17 @@ jobs:
       - name: Install Coverlet
         shell: powershell
         run: dotnet tool install --global coverlet.console
+      - name: Build
+        shell: powershell
+        run: dotnet build --configuration Release
+      - name: Test Code Coverage
+        run: dotnet test ./Streetcode/Streetcode.XUnitTest/Streetcode.XUnitTest.csproj --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=./coverage/coverage.xml
       - name: Build and analyze
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"DDeviak_Airport" /o:"ddeviak" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportPaths="./coverage/coverage.xml"
-            dotnet build --no-incremental
-            coverlet .\Tests\bin\Debug\net7.0\WebAPI.Tests.dll --target "dotnet" --targetargs "test --no-build" -f=opencover -o="coverage.xml" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=./coverage/coverage.xml
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"DDeviak_Airport" /o:"ddeviak" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportPaths="./coverage/coverage.xml"
+            dotnet build --configuration Release
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
